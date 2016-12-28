@@ -1,0 +1,51 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.1"
+
+    defaultConfig {
+        applicationId "moodgenre.spotify.com.moodgenre"
+        minSdkVersion 15
+        targetSdkVersion 24
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    // AMZN
+    compile 'com.amazonaws:aws-android-sdk-core:2.3.+'
+    compile 'com.amazonaws:aws-android-sdk-cognito:2.3.+'
+    compile 'com.amazonaws:aws-android-sdk-rekognition:2.3.+'
+    //compile 'com.amazonaws:aws-android-sdk-s3:2.2.+'
+    //compile 'com.amazonaws:aws-android-sdk-ddb:2.2.+'
+
+    // SPOT
+    // (had to change names and use ext approach diff from docs)
+    compile (name: 'spotify-android-auth-1.0.0', ext:'aar')
+    compile (name: 'spotify-player-24-noconnect-2.20b', ext:'aar')
+
+    // All other dependencies for your app should also be here:
+    compile 'com.android.support:appcompat-v7:24.1.1'
+
+    // Required -- JUnit 4 framework
+    testCompile 'junit:junit:4.12'
+    // Optional -- Mockito framework
+    testCompile 'org.mockito:mockito-core:1.10.19'
+}

@@ -1,0 +1,179 @@
+MoodGenre concept
+-----------------
+Use Spotify Auth SDK to auth.
+Use Spotify SDK to control player, manage playlists, and discover music (recommendation via Echo Nest).
+Use Amazon Rekognition API to take pictures (selfies or otherwise) and determine facial "sentiment."
+Based on sentiment auto start a corresponding playlist.
+
+Other ideas:
+* do the opposite of sentiment, cheer me up, make me sad?
+* allow key recommendation inputs to be specified, danceability, speechiness, popularity, etc
+* show more relevant ads based on sentiment?
+
+Spotify Auth SDK: https://developer.spotify.com/technologies/spotify-android-sdk/android-sdk-authentication-guide/
+Spotify Android SDK: https://developer.spotify.com/technologies/spotify-android-sdk/
+Rekognition: https://aws.amazon.com/rekognition/
+
+
+
+and Android Player SDK with APIs to discover and play music.
+Base the seeding of the recommendation engine on selfies with
+
+
+random notes
+------------------
+https://accounts.spotify.com/authorize?client_id=78b4b965e01c4351b16ceb07c0fc6d8b&response_type=token&redirect_uri=https%3A%2F%2Fabout.me%2Fcharliecollins&show_dialog=false&utm_source=spotify-sdk&utm_medium=android-sdk&utm_campaign=android-sdk&scope=user-read-private%20streaming
+https://accounts.spotify.com/deauthorize?client_id=X
+
+https://accounts.spotify.com/en/status
+
+https://accounts.spotify.com/authorize
+?client_id=78b4b965e01c4351b16ceb07c0fc6d8b
+&response_type=token
+&redirect_uri=https%3A%2F%2Fabout.me%2Fcharliecollins
+&show_dialog=false
+&utm_source=spotify-sdk
+&utm_medium=android-sdk
+&utm_campaign=android-sdk
+&scope=user-read-private%20streaming
+
+
+Use EchoNest in Spotify
+-----------------------
+allow sliders for danceability, popularity, etc, all the echonest stuff, a thousand fields, acousticenss, speechinees, more
+https://developer.spotify.com/web-api/get-recommendations/
+{
+   "genres":[
+      "acoustic",
+      "afrobeat",
+      "alt-rock",
+      "alternative",
+      "ambient",
+      "anime",
+      "black-metal",
+      "bluegrass",
+      "blues",
+      "bossanova",
+      "brazil",
+      "breakbeat",
+      "british",
+      "cantopop",
+      "chicago-house",
+      "children",
+      "chill",
+      "classical",
+      "club",
+      "comedy",
+      "country",
+      "dance",
+      "dancehall",
+      "death-metal",
+      "deep-house",
+      "detroit-techno",
+      "disco",
+      "disney",
+      "drum-and-bass",
+      "dub",
+      "dubstep",
+      "edm",
+      "electro",
+      "electronic",
+      "emo",
+      "folk",
+      "forro",
+      "french",
+      "funk",
+      "garage",
+      "german",
+      "gospel",
+      "goth",
+      "grindcore",
+      "groove",
+      "grunge",
+      "guitar",
+      "happy",
+      "hard-rock",
+      "hardcore",
+      "hardstyle",
+      "heavy-metal",
+      "hip-hop",
+      "holidays",
+      "honky-tonk",
+      "house",
+      "idm",
+      "indian",
+      "indie",
+      "indie-pop",
+      "industrial",
+      "iranian",
+      "j-dance",
+      "j-idol",
+      "j-pop",
+      "j-rock",
+      "jazz",
+      "k-pop",
+      "kids",
+      "latin",
+      "latino",
+      "malay",
+      "mandopop",
+      "metal",
+      "metal-misc",
+      "metalcore",
+      "minimal-techno",
+      "movies",
+      "mpb",
+      "new-age",
+      "new-release",
+      "opera",
+      "pagode",
+      "party",
+      "philippines-opm",
+      "piano",
+      "pop",
+      "pop-film",
+      "post-dubstep",
+      "power-pop",
+      "progressive-house",
+      "psych-rock",
+      "punk",
+      "punk-rock",
+      "r-n-b",
+      "rainy-day",
+      "reggae",
+      "reggaeton",
+      "road-trip",
+      "rock",
+      "rock-n-roll",
+      "rockabilly",
+      "romance",
+      "sad",
+      "salsa",
+      "samba",
+      "sertanejo",
+      "show-tunes",
+      "singer-songwriter",
+      "ska",
+      "sleep",
+      "songwriter",
+      "soul",
+      "soundtracks",
+      "spanish",
+      "study",
+      "summer",
+      "swedish",
+      "synth-pop",
+      "tango",
+      "techno",
+      "trance",
+      "trip-hop",
+      "turkish",
+      "work-out",
+      "world-music"
+   ]
+}
+
+Rekognition sentiments/emotions
+-------------------------------
+http://docs.aws.amazon.com/rekognition/latest/dg/API_DetectFaces.html
+Valid Values: HAPPY | SAD | ANGRY | CONFUSED | DISGUSTED | SURPRISED | CALM | UNKNOWN
