@@ -21,6 +21,17 @@ and Android Player SDK with APIs to discover and play music.
 Base the seeding of the recommendation engine on selfies with
 
 
+stack already
+-------------
+OkHtpClient
+RetroFit
+Jackson
+RxAndroid
+Picasso
+EasyImage
+Nammu
+
+
 random notes
 ------------------
 https://accounts.spotify.com/authorize?client_id=<CLIENT_ID>&response_type=token&redirect_uri=https%3A%2F%2F<DOMAIN>%2F<CALLBACK>&show_dialog=false&utm_source=spotify-sdk&utm_medium=android-sdk&utm_campaign=android-sdk&scope=user-read-private%20streaming

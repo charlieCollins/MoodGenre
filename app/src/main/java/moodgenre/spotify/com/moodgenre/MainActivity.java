@@ -33,13 +33,20 @@ import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.io.File;
-import java.util.List;
+
+import moodgenre.spotify.com.moodgenre.model.TrackContainer;
 
 import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
 import pl.aprilapps.easyphotopicker.EasyImageConfig;
 import pl.tajchert.nammu.Nammu;
 import pl.tajchert.nammu.PermissionCallback;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 
 public class MainActivity extends Activity  {
@@ -55,6 +62,10 @@ public class MainActivity extends Activity  {
     private ConnectionStateCallback spotifyConnectionStateCallback;
     private Player.NotificationCallback spotifyPlayerNotificationCallback;
     private Player.OperationCallback spotifyPlayerOperationCallback;
+    private String spotifyAccessToken;
+
+    private SpotifyService spotifyService;
+    private Subscriber spotifyServiceSubscriber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,12 +181,42 @@ public class MainActivity extends Activity  {
             }
         };
 
-        initFromOnCreate();
+        spotifyServiceSubscriber = new Subscriber<TrackContainer>() {
+            @Override
+            public void onCompleted() {
+                Log.d(Constants.TAG, "Spotify getRecommendations completed");
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.d(Constants.TAG, "Spotify getRecommendations error:" + e.getMessage());
+            }
+
+            @Override
+            public void onNext(TrackContainer trackContainer) {
+                Log.d(Constants.TAG, "Spotify getRecommendations TrackContainer: " + trackContainer);
+                // TODO got a track container, create a playlist for it and submit to player
+            }
+        };
+
+        MoodGenreApplication application = (MoodGenreApplication) this.getApplication();
+        spotifyService = application.getSpotifyService();
+
+        checkPerms();
+
+        initAmazonAuth();
+
+        initSpotifyAuth();
     }
 
     @Override
     protected void onDestroy() {
+
         Spotify.destroyPlayer(this);
+
+        // unsubscribe rxjava network call
+        spotifyServiceSubscriber.unsubscribe();
+
         super.onDestroy();
     }
 
@@ -212,7 +253,11 @@ public class MainActivity extends Activity  {
             Log.d(Constants.TAG, "response: " + response.toString());
 
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
-                initSpotifyPlayer(response.getAccessToken());
+                spotifyAccessToken = response.getAccessToken();
+                initSpotifyPlayer(spotifyAccessToken);
+
+                getSpotifyRecomendations();
+
             }
         }
     }
@@ -220,14 +265,6 @@ public class MainActivity extends Activity  {
     //
     // private
     //
-
-    private void initFromOnCreate() {
-        checkPerms();
-
-        initAmazonAuth();
-
-        initSpotifyAuth();
-    }
 
     private void checkPerms() {
         // NAMMU permissions helper
@@ -292,6 +329,15 @@ public class MainActivity extends Activity  {
     //
     // SPOT
     //
+
+    private void getSpotifyRecomendations() {
+        Observable<TrackContainer> observable = spotifyService.getReccomendations("Bearer " + spotifyAccessToken, "alternative");
+        Subscription subscription = observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(spotifyServiceSubscriber);
+
+
+    }
 
     private void initSpotifyAuth() {
         // TODO check if already authed?
