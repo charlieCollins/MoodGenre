@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -53,10 +55,14 @@ public class MainActivity extends Activity  {
 
     private static final int SPOTIFY_AUTH_REQUEST_CODE = 1738;
 
-    private Button toggleAuthButton;
     private Button chooseImageButton;
     private Button playPauseButton;
     private TextView label1;
+    private TextView authStateLabel;
+
+    private RecyclerView trackList;
+    private RecyclerView.Adapter trackListAdapter;
+    private RecyclerView.LayoutManager trackListLayoutManager;
 
     private Player spotifyPlayer;
     private ConnectionStateCallback spotifyConnectionStateCallback;
@@ -74,24 +80,14 @@ public class MainActivity extends Activity  {
 
         Log.d(Constants.TAG, "onCreate");
 
-        toggleAuthButton = (Button) findViewById(R.id.button_toggle_spotify_auth);
         chooseImageButton = (Button) findViewById(R.id.button_choose_image);
         playPauseButton = (Button) findViewById(R.id.button_play_pause);
-        label1 = (TextView) findViewById(R.id.textView1);
-
-        toggleAuthButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "click", Toast.LENGTH_SHORT).show();
-            }
-        });
+        label1 = (TextView) findViewById(R.id.label);
+        authStateLabel = (TextView) findViewById(R.id.label_auth_state);
 
         chooseImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ///Intent intent = new Intent(Intent.ACTION_PICK,
-                ///        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                ///startActivityForResult(intent, IMAGE_PICKER_REQUEST_CODE);
                 EasyImage.openGallery(MainActivity.this, EasyImageConfig.REQ_PICK_PICTURE_FROM_GALLERY);
             }
         });
@@ -100,9 +96,7 @@ public class MainActivity extends Activity  {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 // toggle spot pause/play
-
                 if (spotifyPlayer == null) {
                     Toast.makeText(MainActivity.this, "Spotify player not ready", Toast.LENGTH_SHORT).show();
                 } else {
@@ -138,6 +132,18 @@ public class MainActivity extends Activity  {
                 handleSpotifyError(error);
             }
         };
+
+        // recycler view
+        trackList = (RecyclerView) findViewById(R.id.track_list);
+        trackList.setHasFixedSize(true);
+
+        // use a linear layout manager
+        trackListLayoutManager = new LinearLayoutManager(this);
+        trackList.setLayoutManager(trackListLayoutManager);
+
+        // specify an adapter (see also next example)
+        //trackListAdapter = new MyAdapter(myDataset);
+        trackList.setAdapter(trackListAdapter);
 
         // spotify player callback
         spotifyConnectionStateCallback = new ConnectionStateCallback() {
@@ -250,13 +256,15 @@ public class MainActivity extends Activity  {
             Log.d(Constants.TAG, "SPOTIFY_AUTH_REQUEST_CODE match, process response");
 
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
-            Log.d(Constants.TAG, "response: " + response.toString());
+            Log.d(Constants.TAG, "response type: " + response.getType().toString());
+
+            authStateLabel.setText(response.getType().toString());
 
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 spotifyAccessToken = response.getAccessToken();
                 initSpotifyPlayer(spotifyAccessToken);
 
-                getSpotifyRecomendations();
+                getSpotifyRecommendations();
 
             }
         }
@@ -330,13 +338,11 @@ public class MainActivity extends Activity  {
     // SPOT
     //
 
-    private void getSpotifyRecomendations() {
+    private void getSpotifyRecommendations() {
         Observable<TrackContainer> observable = spotifyService.getReccomendations("Bearer " + spotifyAccessToken, "alternative");
         Subscription subscription = observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(spotifyServiceSubscriber);
-
-
     }
 
     private void initSpotifyAuth() {

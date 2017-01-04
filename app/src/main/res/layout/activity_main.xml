@@ -13,39 +13,50 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        android:id="@+id/textView1" />
+        android:text="MoodGenre"
+        android:id="@+id/label"
+        android:textAppearance="@android:style/TextAppearance.Material.Large" />
 
-    <Button
-        android:text="Toggle Spotify Auth"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView1"
+        android:text="Auth State"
+        android:id="@+id/label_auth_state"
+        android:layout_below="@+id/label"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="14dp"
-        android:layout_marginStart="14dp"
-        android:layout_marginTop="49dp"
-        android:id="@+id/button_toggle_spotify_auth" />
+        android:layout_marginTop="33dp"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
-    <Button
-        android:text="Choose Image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button_toggle_spotify_auth"
-        android:layout_alignLeft="@+id/button_toggle_spotify_auth"
-        android:layout_alignStart="@+id/button_toggle_spotify_auth"
-        android:layout_marginTop="27dp"
-        android:id="@+id/button_choose_image" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/track_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="29dp"
+        android:layout_below="@+id/button_choose_image"/>
 
     <Button
         android:text="Play/Pause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/button_play_pause"
-        android:layout_centerVertical="true"
-        android:layout_alignLeft="@+id/button_choose_image"
-        android:layout_alignStart="@+id/button_choose_image" />
+        android:layout_marginLeft="62dp"
+        android:layout_marginStart="62dp"
+        android:layout_alignBottom="@+id/label_auth_state"
+        android:layout_toRightOf="@+id/label"
+        android:layout_toEndOf="@+id/label" />
+
+    <Button
+        android:text="Choose Image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_choose_image"
+        android:layout_below="@+id/button_play_pause"
+        android:layout_alignRight="@+id/button_play_pause"
+        android:layout_alignEnd="@+id/button_play_pause"
+        android:layout_marginTop="33dp" />
 
 
 </RelativeLayout>
