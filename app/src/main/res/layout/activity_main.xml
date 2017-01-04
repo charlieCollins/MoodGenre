@@ -37,4 +37,15 @@
         android:layout_alignStart="@+id/button_toggle_spotify_auth"
         android:layout_marginTop="27dp"
         android:id="@+id/button_choose_image" />
+
+    <Button
+        android:text="Play/Pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/button_play_pause"
+        android:layout_centerVertical="true"
+        android:layout_alignLeft="@+id/button_choose_image"
+        android:layout_alignStart="@+id/button_choose_image" />
+
+
 </RelativeLayout>
