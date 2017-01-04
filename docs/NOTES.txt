@@ -23,13 +23,13 @@ Base the seeding of the recommendation engine on selfies with
 
 random notes
 ------------------
-https://accounts.spotify.com/authorize?client_id=78b4b965e01c4351b16ceb07c0fc6d8b&response_type=token&redirect_uri=https%3A%2F%2Fabout.me%2Fcharliecollins&show_dialog=false&utm_source=spotify-sdk&utm_medium=android-sdk&utm_campaign=android-sdk&scope=user-read-private%20streaming
+https://accounts.spotify.com/authorize?client_id=<CLIENT_ID>&response_type=token&redirect_uri=https%3A%2F%2F<DOMAIN>%2F<CALLBACK>&show_dialog=false&utm_source=spotify-sdk&utm_medium=android-sdk&utm_campaign=android-sdk&scope=user-read-private%20streaming
 https://accounts.spotify.com/deauthorize?client_id=X
 
 https://accounts.spotify.com/en/status
 
 https://accounts.spotify.com/authorize
-?client_id=78b4b965e01c4351b16ceb07c0fc6d8b
+?client_id=CLIENT_ID
 &response_type=token
 &redirect_uri=https%3A%2F%2Fabout.me%2Fcharliecollins
 &show_dialog=false
@@ -39,10 +39,14 @@ https://accounts.spotify.com/authorize
 &scope=user-read-private%20streaming
 
 
-Use EchoNest in Spotify
------------------------
+Use Spotif API to get avail genres and then to recommend playlists based on Genre (EchoNest)
+---------------------------------------------------------------------------------------------
 allow sliders for danceability, popularity, etc, all the echonest stuff, a thousand fields, acousticenss, speechinees, more
-https://developer.spotify.com/web-api/get-recommendations/
+
+See "Browse" part of API docs.
+
+Get available genre seeds -- this is done once and hard coded into hack app for now:
+https://api.spotify.com/v1/recommendations/available-genre-seeds
 {
    "genres":[
       "acoustic",
@@ -173,6 +177,13 @@ https://developer.spotify.com/web-api/get-recommendations/
       "world-music"
    ]
 }
+
+Get reccomendations based on seeds (this part is echonest?):
+https://api.spotify.com/v1/recommendations
+GET /v1/recommendations?seed_genres=alternative HTTP/1.1
+
+
+
 
 Rekognition sentiments/emotions
 -------------------------------
