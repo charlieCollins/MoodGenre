@@ -5,12 +5,11 @@ import android.app.Application;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import moodgenre.spotify.com.moodgenre.service.SpotifyService;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.jackson.JacksonConverterFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created by charliecollins on 1/4/17.

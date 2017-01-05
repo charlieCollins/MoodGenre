@@ -16,9 +16,6 @@ import android.widget.Toast;
 
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
-import com.amazonaws.mobileconnectors.cognito.Dataset;
-import com.amazonaws.mobileconnectors.cognito.DefaultSyncCallback;
 import com.amazonaws.regions.Regions;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -35,9 +32,14 @@ import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import moodgenre.spotify.com.moodgenre.adapters.TrackListAdapter;
+import moodgenre.spotify.com.moodgenre.model.Track;
 import moodgenre.spotify.com.moodgenre.model.TrackContainer;
 
+import moodgenre.spotify.com.moodgenre.service.SpotifyService;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
 import pl.aprilapps.easyphotopicker.EasyImage;
 import pl.aprilapps.easyphotopicker.EasyImageConfig;
@@ -60,7 +62,7 @@ public class MainActivity extends Activity  {
     private TextView label1;
     private TextView authStateLabel;
 
-    private RecyclerView trackList;
+    private RecyclerView trackListRecyclerView;
     private RecyclerView.Adapter trackListAdapter;
     private RecyclerView.LayoutManager trackListLayoutManager;
 
@@ -134,16 +136,21 @@ public class MainActivity extends Activity  {
         };
 
         // recycler view
-        trackList = (RecyclerView) findViewById(R.id.track_list);
-        trackList.setHasFixedSize(true);
-
-        // use a linear layout manager
+        trackListRecyclerView = (RecyclerView) findViewById(R.id.track_list_recycler);
+        trackListRecyclerView.setHasFixedSize(true);
         trackListLayoutManager = new LinearLayoutManager(this);
-        trackList.setLayoutManager(trackListLayoutManager);
+        trackListRecyclerView.setLayoutManager(trackListLayoutManager);
+        Track track1 = new Track();
+        track1.setName("test1");
+        Track track2 = new Track();
+        track2.setName("test2");
+        List<Track> trackList = new ArrayList<Track>();
+        trackList.add(track1);
+        trackList.add(track2);
 
-        // specify an adapter (see also next example)
-        //trackListAdapter = new MyAdapter(myDataset);
-        trackList.setAdapter(trackListAdapter);
+        trackListAdapter = new TrackListAdapter(trackList);
+        trackListRecyclerView.setAdapter(trackListAdapter);
+
 
         // spotify player callback
         spotifyConnectionStateCallback = new ConnectionStateCallback() {
@@ -263,9 +270,7 @@ public class MainActivity extends Activity  {
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 spotifyAccessToken = response.getAccessToken();
                 initSpotifyPlayer(spotifyAccessToken);
-
-                getSpotifyRecommendations();
-
+                ///getSpotifyRecommendations();
             }
         }
     }
@@ -339,7 +344,7 @@ public class MainActivity extends Activity  {
     //
 
     private void getSpotifyRecommendations() {
-        Observable<TrackContainer> observable = spotifyService.getReccomendations("Bearer " + spotifyAccessToken, "alternative");
+        Observable<TrackContainer> observable = spotifyService.getRecommendations("Bearer " + spotifyAccessToken, "alternative");
         Subscription subscription = observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(spotifyServiceSubscriber);

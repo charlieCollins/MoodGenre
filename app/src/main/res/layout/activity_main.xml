@@ -29,7 +29,7 @@
         android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
     <android.support.v7.widget.RecyclerView
-        android:id="@+id/track_list"
+        android:id="@+id/track_list_recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"

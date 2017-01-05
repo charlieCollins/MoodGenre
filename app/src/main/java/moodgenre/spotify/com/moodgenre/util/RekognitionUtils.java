@@ -1,4 +1,4 @@
-package moodgenre.spotify.com.moodgenre;
+package moodgenre.spotify.com.moodgenre.util;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.services.rekognition.AmazonRekognitionClient;

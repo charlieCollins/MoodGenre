@@ -1,4 +1,4 @@
-package moodgenre.spotify.com.moodgenre;
+package moodgenre.spotify.com.moodgenre.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +11,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.List;
+
+import moodgenre.spotify.com.moodgenre.R;
 
 /**
  * Created by charliecollins on 12/28/16.

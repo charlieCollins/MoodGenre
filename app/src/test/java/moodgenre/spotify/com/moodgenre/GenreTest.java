@@ -3,7 +3,7 @@ package moodgenre.spotify.com.moodgenre;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import moodgenre.spotify.com.moodgenre.model.Genre;
 
 
 public class GenreTest {

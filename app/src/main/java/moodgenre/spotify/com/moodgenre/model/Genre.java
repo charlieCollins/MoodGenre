@@ -1,4 +1,4 @@
-package moodgenre.spotify.com.moodgenre;
+package moodgenre.spotify.com.moodgenre.model;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package moodgenre.spotify.com.moodgenre;
+package moodgenre.spotify.com.moodgenre.service;
 
 /**
  * Created by charliecollins on 1/4/17.
@@ -15,6 +15,6 @@ import rx.Observable;
 public interface SpotifyService {
 
     @GET("recommendations")
-    Observable<TrackContainer> getReccomendations(@Header("Authorization") String token, @Query("seed_genres") String seedGenres);
+    Observable<TrackContainer> getRecommendations(@Header("Authorization") String token, @Query("seed_genres") String seedGenres);
 
 }
