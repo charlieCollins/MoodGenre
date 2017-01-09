@@ -65,7 +65,6 @@ public class MainActivity extends Activity  {
     private ImageView playPauseButton;
     private Button getRecommendationsButton;
     private TextView label1;
-    private TextView authStateLabel;
 
     private RecyclerView trackListRecyclerView;
     private TrackListAdapter trackListAdapter;
@@ -92,7 +91,6 @@ public class MainActivity extends Activity  {
         playPauseButton = (ImageView) findViewById(R.id.button_play_pause);
         getRecommendationsButton = (Button) findViewById(R.id.button_get_recommendations);
         label1 = (TextView) findViewById(R.id.label);
-        authStateLabel = (TextView) findViewById(R.id.label_auth_state);
 
         chooseImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -278,8 +276,6 @@ public class MainActivity extends Activity  {
 
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             Log.d(Constants.TAG, "response type: " + response.getType().toString());
-
-            authStateLabel.setText(response.getType().toString());
 
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 spotifyAccessToken = response.getAccessToken();
