@@ -9,8 +9,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,9 +49,11 @@ import pl.tajchert.nammu.Nammu;
 import pl.tajchert.nammu.PermissionCallback;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
@@ -58,13 +62,15 @@ public class MainActivity extends Activity  {
     private static final int SPOTIFY_AUTH_REQUEST_CODE = 1738;
 
     private Button chooseImageButton;
-    private Button playPauseButton;
+    private ImageView playPauseButton;
+    private Button getRecommendationsButton;
     private TextView label1;
     private TextView authStateLabel;
 
     private RecyclerView trackListRecyclerView;
-    private RecyclerView.Adapter trackListAdapter;
+    private TrackListAdapter trackListAdapter;
     private RecyclerView.LayoutManager trackListLayoutManager;
+    private List<Track> trackList;
 
     private Player spotifyPlayer;
     private ConnectionStateCallback spotifyConnectionStateCallback;
@@ -83,7 +89,8 @@ public class MainActivity extends Activity  {
         Log.d(Constants.TAG, "onCreate");
 
         chooseImageButton = (Button) findViewById(R.id.button_choose_image);
-        playPauseButton = (Button) findViewById(R.id.button_play_pause);
+        playPauseButton = (ImageView) findViewById(R.id.button_play_pause);
+        getRecommendationsButton = (Button) findViewById(R.id.button_get_recommendations);
         label1 = (TextView) findViewById(R.id.label);
         authStateLabel = (TextView) findViewById(R.id.label_auth_state);
 
@@ -93,7 +100,6 @@ public class MainActivity extends Activity  {
                 EasyImage.openGallery(MainActivity.this, EasyImageConfig.REQ_PICK_PICTURE_FROM_GALLERY);
             }
         });
-        chooseImageButton.setEnabled(false);
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,17 +113,20 @@ public class MainActivity extends Activity  {
                     Metadata metadata = spotifyPlayer.getMetadata();
                     if (playbackState.isPlaying) {
                         spotifyPlayer.pause(spotifyPlayerOperationCallback);
-                    } else {
-
-                        if (playbackState.positionMs > 0) {
-                            // TODO how to tell if player is paused, just position > 0? or is there an actual pause state?
-                            spotifyPlayer.resume(spotifyPlayerOperationCallback);
-                        } else {
-                            // start the track
-                            spotifyPlayer.playUri(null, "spotify:track:7BKLCZ1jbUBVqRi2FVlTVw", 0, 0);
-                        }
+                        playPauseButton.setImageResource(android.R.drawable.ic_media_play);
+                    } else if (playbackState.positionMs > 0) {
+                        // TODO how to tell if player is paused, just position > 0? or is there an actual pause state?
+                        spotifyPlayer.resume(spotifyPlayerOperationCallback);
+                        playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
                     }
                 }
+            }
+        });
+
+        getRecommendationsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getSpotifyRecommendations();
             }
         });
 
@@ -140,17 +149,20 @@ public class MainActivity extends Activity  {
         trackListRecyclerView.setHasFixedSize(true);
         trackListLayoutManager = new LinearLayoutManager(this);
         trackListRecyclerView.setLayoutManager(trackListLayoutManager);
-        Track track1 = new Track();
-        track1.setName("test1");
-        Track track2 = new Track();
-        track2.setName("test2");
-        List<Track> trackList = new ArrayList<Track>();
-        trackList.add(track1);
-        trackList.add(track2);
-
-        trackListAdapter = new TrackListAdapter(trackList);
+        trackList = new ArrayList<>();
+        trackListAdapter = new TrackListAdapter(MainActivity.this, trackList);
         trackListRecyclerView.setAdapter(trackListAdapter);
 
+        // get track list click events as observable
+        // TODO do I need to unsubscribe from this somehow?
+        trackListAdapter.asObservable().subscribe(new Action1<Track>() {
+            @Override
+            public void call(Track track) {
+                // TODO make other adapter list items not clickable until one is processed?
+                Toast.makeText(MainActivity.this, "playing track: " + track.getName(), Toast.LENGTH_SHORT).show();
+                spotifyPlayer.playUri(null, track.getUri(), 0, 0);
+            }
+        });
 
         // spotify player callback
         spotifyConnectionStateCallback = new ConnectionStateCallback() {
@@ -208,7 +220,9 @@ public class MainActivity extends Activity  {
             @Override
             public void onNext(TrackContainer trackContainer) {
                 Log.d(Constants.TAG, "Spotify getRecommendations TrackContainer: " + trackContainer);
-                // TODO got a track container, create a playlist for it and submit to player
+                trackList.clear();
+                trackList.addAll(trackContainer.getTracks());
+                trackListAdapter.notifyDataSetChanged();
             }
         };
 
@@ -270,7 +284,6 @@ public class MainActivity extends Activity  {
             if (response.getType() == AuthenticationResponse.Type.TOKEN) {
                 spotifyAccessToken = response.getAccessToken();
                 initSpotifyPlayer(spotifyAccessToken);
-                ///getSpotifyRecommendations();
             }
         }
     }
