@@ -9,41 +9,32 @@
     android:padding="10dp"
     tools:context="moodgenre.spotify.com.moodgenre.MainActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
-
-        <TextView
-            android:id="@+id/label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="MoodGenre"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            />
-
-    </LinearLayout>
+    <include layout="@layout/screen_header" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:orientation="vertical"
         android:gravity="center">
 
-        <Button
+        <ImageView
             android:id="@+id/button_path_image_detection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Gen Playlist from Image Detection" />
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_margin="5dp"
+            android:text="Get Playlist from Image Recognition"
+            android:src="@drawable/ic_noun_camera"
+            android:background="@drawable/image_border"/>
 
-        <Button
+        <ImageView
             android:id="@+id/button_path_genre_selection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Gen Playlist by Genre Selection" />
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_margin="5dp"
+            android:text="Get Playlist by Genre Selection"
+            android:src="@drawable/ic_noun_choices"
+            android:background="@drawable/image_border"/>
 
 
     </LinearLayout>

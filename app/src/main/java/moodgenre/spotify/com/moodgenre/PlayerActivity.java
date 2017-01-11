@@ -120,7 +120,7 @@ public class PlayerActivity extends Activity  {
             @Override
             public void call(Track track) {
                 // TODO make other adapter list items not clickable until one is processed?
-                Toast.makeText(PlayerActivity.this, "playing track: " + track.getName(), Toast.LENGTH_SHORT).show();
+                ///Toast.makeText(PlayerActivity.this, "playing track: " + track.getName(), Toast.LENGTH_SHORT).show();
                 playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
                 labelNowPlaying.setText(track.getName());
                 spotifyPlayer.playUri(null, track.getUri(), 0, 0);
@@ -169,9 +169,7 @@ public class PlayerActivity extends Activity  {
             }
         };
 
-
         spotifyAccessToken = application.getSpotifyAccessToken();
-
         initSpotifyPlayer();
     }
 

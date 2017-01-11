@@ -2,10 +2,12 @@ package moodgenre.spotify.com.moodgenre;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.regions.Regions;
@@ -21,8 +23,8 @@ public class MainActivity extends Activity  {
 
     private MoodGenreApplication application;
 
-    private Button buttonPathImageDetection;
-    private Button buttonPathGenreSelection;
+    private ImageView buttonPathImageDetection;
+    private ImageView buttonPathGenreSelection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,13 +33,14 @@ public class MainActivity extends Activity  {
 
         Log.d(Constants.TAG, "onCreate");
 
-        buttonPathImageDetection = (Button) findViewById(R.id.button_path_image_detection);
-        buttonPathGenreSelection = (Button) findViewById(R.id.button_path_genre_selection);
+        buttonPathImageDetection = (ImageView) findViewById(R.id.button_path_image_detection);
+        buttonPathGenreSelection = (ImageView) findViewById(R.id.button_path_genre_selection);
 
         buttonPathImageDetection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //EasyImage.openGallery(MainActivity.this, EasyImageConfig.REQ_PICK_PICTURE_FROM_GALLERY);
+                buttonPathImageDetection.setColorFilter(0xFF000000, PorterDuff.Mode.MULTIPLY);
                 startActivity(new Intent(MainActivity.this, PathImageDetectionActivity.class));
 
             }
@@ -46,6 +49,7 @@ public class MainActivity extends Activity  {
         buttonPathGenreSelection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                buttonPathGenreSelection.setColorFilter(0xFF000000, PorterDuff.Mode.MULTIPLY);
                 startActivity(new Intent(MainActivity.this, PathGenreSelectionActivity.class));
             }
         });
@@ -55,6 +59,13 @@ public class MainActivity extends Activity  {
         initAmazonAuth();
 
         initSpotifyAuth();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        buttonPathImageDetection.clearColorFilter();
+        buttonPathGenreSelection.clearColorFilter();
     }
 
     @Override
