@@ -17,8 +17,9 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class MoodGenreApplication extends Application {
 
-    private SpotifyService spotifyService;
+    private String spotifyAccessToken;
 
+    private SpotifyService spotifyService;
 
     @Override
     public void onCreate() {
@@ -36,6 +37,16 @@ public class MoodGenreApplication extends Application {
     public void unregisterActivityLifecycleCallbacks(ActivityLifecycleCallbacks callback) {
         super.unregisterActivityLifecycleCallbacks(callback);
     }
+
+    public String getSpotifyAccessToken() {
+        return this.spotifyAccessToken;
+    }
+
+    public void setSpotifyAccessToken(String spotifyAuthToken) {
+        this.spotifyAccessToken = spotifyAuthToken;
+        // TODO check token expiration and serialize it if longer lived?
+    }
+
 
     public SpotifyService getSpotifyService() {
         return this.spotifyService;

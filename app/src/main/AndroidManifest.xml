@@ -21,6 +21,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".PathGenreSelectionActivity" />
+        <activity android:name=".PathImageDetectionActivity" />
+        <activity android:name=".PlayerActivity" />
+
         <!-- Needed for Spotify LoginActivity to work -->
         <activity
             android:name="com.spotify.sdk.android.authentication.LoginActivity"

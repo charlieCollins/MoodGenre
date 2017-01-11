@@ -7,13 +7,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="10dp"
-    tools:context="moodgenre.spotify.com.moodgenre.MainActivity">
+    tools:context="moodgenre.spotify.com.moodgenre.PathImageDetectionActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
+        android:orientation="horizontal">
 
         <TextView
             android:id="@+id/label"
@@ -21,34 +20,19 @@
             android:layout_height="wrap_content"
             android:text="MoodGenre"
             android:textSize="32sp"
-            android:textStyle="bold"
-            />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:orientation="vertical"
-        android:gravity="center">
-
-        <Button
-            android:id="@+id/button_path_image_detection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:enabled="false"
-            android:text="Gen Playlist from Image Detection" />
-
-        <Button
-            android:id="@+id/button_path_genre_selection"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:enabled="false"
-            android:text="Gen Playlist by Genre Selection" />
+            android:textStyle="bold"/>
 
 
     </LinearLayout>
+
+
+
+        <Button
+            android:id="@+id/button_choose_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose Image" />
+
 
 
 
