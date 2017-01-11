@@ -6,22 +6,17 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.regions.Regions;
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
 import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.spotify.sdk.android.player.Spotify;
 
 
-public class MainActivity extends Activity  {
+public class MainActivity extends BaseActivity  {
 
     private static final int SPOTIFY_AUTH_REQUEST_CODE = 1738;
-
-    private MoodGenreApplication application;
 
     private ImageView buttonPathImageDetection;
     private ImageView buttonPathGenreSelection;
@@ -30,8 +25,6 @@ public class MainActivity extends Activity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Log.d(Constants.TAG, "onCreate");
 
         buttonPathImageDetection = (ImageView) findViewById(R.id.button_path_image_detection);
         buttonPathGenreSelection = (ImageView) findViewById(R.id.button_path_genre_selection);
@@ -52,12 +45,8 @@ public class MainActivity extends Activity  {
                 buttonPathGenreSelection.setColorFilter(0xFF000000, PorterDuff.Mode.MULTIPLY);
                 startActivity(new Intent(MainActivity.this, PathGenreSelectionActivity.class));
             }
-        });
-
-        application = (MoodGenreApplication) this.getApplication();
-
-        initAmazonAuth();
-
+        });        
+     
         initSpotifyAuth();
     }
 
@@ -70,9 +59,7 @@ public class MainActivity extends Activity  {
 
     @Override
     protected void onDestroy() {
-
         Spotify.destroyPlayer(this);
-
         super.onDestroy();
     }
 
@@ -99,44 +86,6 @@ public class MainActivity extends Activity  {
     //
     // private
     //
-
-    //
-    // AMZN
-    //
-
-    private void initAmazonAuth() {
-        // AMZN
-        // Initialize the Amazon Cognito credentials provider
-        // TODO check if already authed/cache/etc?
-        final CognitoCachingCredentialsProvider credentialsProvider =
-                new CognitoCachingCredentialsProvider(getApplicationContext(),
-                        Constants.AMZN_IDENTITY_POOL_ID,
-                        Regions.US_EAST_2
-                );
-        new Thread(new Runnable() {
-            public void run() {
-                String identityId = credentialsProvider.getIdentityId();
-                Log.d(Constants.TAG, "AMZN ID is " + identityId);
-            }
-        }).start();
-
-        /*
-        // Initialize the Cognito Sync client
-        CognitoSyncManager syncClient = new CognitoSyncManager(
-                getApplicationContext(),
-                Regions.US_EAST_2, // Region
-                credentialsProvider);
-        // Create a record in a dataset and synchronize with the server
-        Dataset dataset = syncClient.openOrCreateDataset("myDataset");
-        dataset.put("myKey", "myValue");
-        dataset.synchronize(new DefaultSyncCallback() {
-            @Override
-            public void onSuccess(Dataset dataset, List newRecords) {
-                //Your handler code here
-            }
-        });
-        */
-    }
 
     //
     // SPOT

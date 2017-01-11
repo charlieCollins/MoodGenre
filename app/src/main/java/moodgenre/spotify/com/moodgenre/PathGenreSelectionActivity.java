@@ -28,7 +28,7 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
-public class PathGenreSelectionActivity extends Activity  {
+public class PathGenreSelectionActivity extends BaseActivity  {
 
     private Button getPlaylistButton;
     private Button gotoPlayerButton;
@@ -49,8 +49,6 @@ public class PathGenreSelectionActivity extends Activity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_path_genre_selection);
-
-        Log.d(Constants.TAG, "onCreate");
 
         getPlaylistButton = (Button) findViewById(R.id.button_get_playlist);
         gotoPlayerButton = (Button) findViewById(R.id.button_goto_player);
@@ -103,17 +101,7 @@ public class PathGenreSelectionActivity extends Activity  {
         spotifyAccessToken = application.getSpotifyAccessToken();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-        Log.d(Constants.TAG, "onActivityResult");
-    }
-
+   
     //
     // private
     //

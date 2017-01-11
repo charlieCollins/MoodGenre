@@ -37,10 +37,9 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 
-public class PlayerActivity extends Activity  {
+public class PlayerActivity extends BaseActivity  {
 
     private ImageView playPauseButton;
-    private TextView label1;
     private TextView labelNowPlaying;
 
     private RecyclerView trackListRecyclerView;
@@ -58,12 +57,9 @@ public class PlayerActivity extends Activity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        Log.d(Constants.TAG, "onCreate");
-
         MoodGenreApplication application = (MoodGenreApplication) this.getApplication();
 
         playPauseButton = (ImageView) findViewById(R.id.button_play_pause);
-        label1 = (TextView) findViewById(R.id.label);
         labelNowPlaying = (TextView) findViewById(R.id.label_now_playing);
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {
@@ -175,24 +171,13 @@ public class PlayerActivity extends Activity  {
 
     @Override
     protected void onDestroy() {
-
         Spotify.destroyPlayer(this);
-
         super.onDestroy();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        super.onActivityResult(requestCode, resultCode, intent);
-
-        Log.d(Constants.TAG, "onActivityResult");
     }
 
     //
     // private
     //
-
-
 
     //
     // SPOT
