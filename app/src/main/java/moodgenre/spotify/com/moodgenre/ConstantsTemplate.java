@@ -4,6 +4,8 @@ package moodgenre.spotify.com.moodgenre;
  * Created by charliecollins on 12/27/16.
  */
 
+// RENAME this to Constants and set correct IDs for project to compile (lazy sep props)
+
 public class ConstantsTemplate {
 
     // TODO move anything sensitive out of constants and load via config (don't store in vcs)
