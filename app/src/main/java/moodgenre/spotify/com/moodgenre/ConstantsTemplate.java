@@ -8,8 +8,6 @@ package moodgenre.spotify.com.moodgenre;
 
 public class ConstantsTemplate {
 
-    // TODO move anything sensitive out of constants and load via config (don't store in vcs)
-
     public static final String TAG = "com.spotify.moodgenre";
 
     public static final String SPOTIFY_CLIENT_ID = "APP CLIENT ID HERE";
