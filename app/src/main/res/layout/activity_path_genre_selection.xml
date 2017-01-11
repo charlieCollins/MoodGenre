@@ -68,7 +68,9 @@
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_margin="5dp" />
+            android:layout_margin="5dp"
+            android:divider="#000000"
+            android:dividerHeight="1dp"/>
 
     </LinearLayout>
 
