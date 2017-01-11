@@ -79,7 +79,7 @@ public class PlayerActivity extends Activity  {
         Log.d(Constants.TAG, "onCreate");
 
         playPauseButton = (ImageView) findViewById(R.id.button_play_pause);
-        getRecommendationsButton = (Button) findViewById(R.id.button_get_recommendations);
+        getRecommendationsButton = (Button) findViewById(R.id.button_get_recommendations_temp);
         label1 = (TextView) findViewById(R.id.label);
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {

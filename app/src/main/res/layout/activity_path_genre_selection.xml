@@ -26,5 +26,28 @@
     </LinearLayout>
 
 
+    <LinearLayout
+        android:id="@+id/list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/button_get_recommendations"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get Recomendations" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/track_list_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_margin="5dp" />
+
+    </LinearLayout>
+
+
 
 </LinearLayout>
