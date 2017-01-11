@@ -13,13 +13,13 @@ public enum Genre {
     // TODO map all the Spotify genres, see NOTES.txt (from get-recommendations)
 
     // names based on Amazon Rekog emotions, and mapped to Spotify genres
-    HAPPY(Arrays.asList("HAPPY")),
-    SAD(Arrays.asList("SAD")),
-    ANGRY(Arrays.asList("METAL", "METAL-CORE", "BLACK-METAL", "HARDCORE")),
-    CONFUSED(Arrays.asList("COUNTRY")), // because no
-    DISGUSTED(Arrays.asList("EDM", "TECHNO")), // because my friends are disgusted I listen to this
-    SURPRISED(Arrays.asList("K-POP")),
-    CALM(Arrays.asList("CHILL", "SLEEP"));
+    HAPPY(Arrays.asList("happy")),
+    SAD(Arrays.asList("sad")),
+    ANGRY(Arrays.asList("metal", "metal-core", "harcore")),
+    CONFUSED(Arrays.asList("country")), // because no
+    DISGUSTED(Arrays.asList("edm", "techno")), // because my friends are disgusted I listen to this
+    SURPRISED(Arrays.asList("k-pop")),
+    CALM(Arrays.asList("chill", "sleep"));
 
     private List<String> emotions;
 

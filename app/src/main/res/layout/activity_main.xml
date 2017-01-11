@@ -37,14 +37,12 @@
             android:id="@+id/button_path_image_detection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:enabled="false"
             android:text="Gen Playlist from Image Detection" />
 
         <Button
             android:id="@+id/button_path_genre_selection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:enabled="false"
             android:text="Gen Playlist by Genre Selection" />
 
 

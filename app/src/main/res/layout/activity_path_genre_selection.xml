@@ -18,10 +18,9 @@
             android:id="@+id/label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="MoodGenre - selection todo"
-            android:textSize="32sp"
+            android:text="Select Mood(s) for Genre"
+            android:textSize="22sp"
             android:textStyle="bold"/>
-
 
     </LinearLayout>
 
@@ -32,11 +31,49 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <Button
-            android:id="@+id/button_get_recommendations"
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_happy"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Get Recomendations" />
+            android:text="Happy"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_sad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sad"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_angry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Angry"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <android.support.v7.widget.AppCompatCheckBox
+            android:id="@+id/checkbox_confused"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Confused"
+            android:textSize="18sp"
+            android:textStyle="bold"/>
+
+        <Button
+            android:id="@+id/button_get_playlist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get Playlist" />
+
+        <Button
+            android:id="@+id/button_goto_player"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Go to Player (with playlist) " />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/track_list_recycler"

@@ -1,11 +1,8 @@
 package moodgenre.spotify.com.moodgenre;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,11 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.regions.Regions;
-import com.spotify.sdk.android.authentication.AuthenticationClient;
-import com.spotify.sdk.android.authentication.AuthenticationRequest;
-import com.spotify.sdk.android.authentication.AuthenticationResponse;
 import com.spotify.sdk.android.player.Config;
 import com.spotify.sdk.android.player.ConnectionStateCallback;
 import com.spotify.sdk.android.player.Error;
@@ -30,7 +22,6 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,11 +29,6 @@ import moodgenre.spotify.com.moodgenre.adapters.TrackListAdapter;
 import moodgenre.spotify.com.moodgenre.model.Track;
 import moodgenre.spotify.com.moodgenre.model.TrackContainer;
 import moodgenre.spotify.com.moodgenre.service.SpotifyService;
-import pl.aprilapps.easyphotopicker.DefaultCallback;
-import pl.aprilapps.easyphotopicker.EasyImage;
-import pl.aprilapps.easyphotopicker.EasyImageConfig;
-import pl.tajchert.nammu.Nammu;
-import pl.tajchert.nammu.PermissionCallback;
 import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
@@ -54,22 +40,18 @@ import rx.schedulers.Schedulers;
 public class PlayerActivity extends Activity  {
 
     private ImageView playPauseButton;
-    private Button getRecommendationsButton;
     private TextView label1;
+    private TextView labelNowPlaying;
 
     private RecyclerView trackListRecyclerView;
     private TrackListAdapter trackListAdapter;
     private RecyclerView.LayoutManager trackListLayoutManager;
-    private List<Track> trackList;
 
     private Player spotifyPlayer;
     private ConnectionStateCallback spotifyConnectionStateCallback;
     private Player.NotificationCallback spotifyPlayerNotificationCallback;
     private Player.OperationCallback spotifyPlayerOperationCallback;
     private String spotifyAccessToken;
-
-    private SpotifyService spotifyService;
-    private Subscriber spotifyServiceSubscriber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,9 +60,11 @@ public class PlayerActivity extends Activity  {
 
         Log.d(Constants.TAG, "onCreate");
 
+        MoodGenreApplication application = (MoodGenreApplication) this.getApplication();
+
         playPauseButton = (ImageView) findViewById(R.id.button_play_pause);
-        getRecommendationsButton = (Button) findViewById(R.id.button_get_recommendations_temp);
         label1 = (TextView) findViewById(R.id.label);
+        labelNowPlaying = (TextView) findViewById(R.id.label_now_playing);
 
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,13 +90,6 @@ public class PlayerActivity extends Activity  {
             }
         });
 
-        getRecommendationsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getSpotifyRecommendations();
-            }
-        });
-
         spotifyPlayerNotificationCallback = new Player.NotificationCallback() {
             @Override
             public void onPlaybackEvent(PlayerEvent playerEvent) {
@@ -127,13 +104,14 @@ public class PlayerActivity extends Activity  {
             }
         };
 
+
         // recycler view
+        List<Track> playList = application.getPlaylist();
         trackListRecyclerView = (RecyclerView) findViewById(R.id.track_list_recycler);
         trackListRecyclerView.setHasFixedSize(true);
         trackListLayoutManager = new LinearLayoutManager(this);
         trackListRecyclerView.setLayoutManager(trackListLayoutManager);
-        trackList = new ArrayList<>();
-        trackListAdapter = new TrackListAdapter(PlayerActivity.this, trackList);
+        trackListAdapter = new TrackListAdapter(PlayerActivity.this, playList);
         trackListRecyclerView.setAdapter(trackListAdapter);
 
         // get track list click events as observable
@@ -144,6 +122,7 @@ public class PlayerActivity extends Activity  {
                 // TODO make other adapter list items not clickable until one is processed?
                 Toast.makeText(PlayerActivity.this, "playing track: " + track.getName(), Toast.LENGTH_SHORT).show();
                 playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
+                labelNowPlaying.setText(track.getName());
                 spotifyPlayer.playUri(null, track.getUri(), 0, 0);
             }
         });
@@ -190,28 +169,7 @@ public class PlayerActivity extends Activity  {
             }
         };
 
-        spotifyServiceSubscriber = new Subscriber<TrackContainer>() {
-            @Override
-            public void onCompleted() {
-                Log.d(Constants.TAG, "Spotify getRecommendations completed");
-            }
 
-            @Override
-            public void onError(Throwable e) {
-                Log.d(Constants.TAG, "Spotify getRecommendations error:" + e.getMessage());
-            }
-
-            @Override
-            public void onNext(TrackContainer trackContainer) {
-                Log.d(Constants.TAG, "Spotify getRecommendations TrackContainer: " + trackContainer);
-                trackList.clear();
-                trackList.addAll(trackContainer.getTracks());
-                trackListAdapter.notifyDataSetChanged();
-            }
-        };
-
-        MoodGenreApplication application = (MoodGenreApplication) this.getApplication();
-        spotifyService = application.getSpotifyService();
         spotifyAccessToken = application.getSpotifyAccessToken();
 
         initSpotifyPlayer();
@@ -221,9 +179,6 @@ public class PlayerActivity extends Activity  {
     protected void onDestroy() {
 
         Spotify.destroyPlayer(this);
-
-        // unsubscribe rxjava network call
-        spotifyServiceSubscriber.unsubscribe();
 
         super.onDestroy();
     }
@@ -245,18 +200,6 @@ public class PlayerActivity extends Activity  {
     // SPOT
     //
 
-    private void getSpotifyRecommendations() {
-
-        if (spotifyAccessToken == null) {
-            Toast.makeText(this, "Spotify access token not present, cannot continue", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        Observable<TrackContainer> observable = spotifyService.getRecommendations("Bearer " + spotifyAccessToken, "alternative");
-        Subscription subscription = observable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(spotifyServiceSubscriber);
-    }
 
     private void initSpotifyPlayer() {
 
