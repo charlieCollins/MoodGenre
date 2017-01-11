@@ -16,9 +16,10 @@ Spotify Android SDK: https://developer.spotify.com/technologies/spotify-android-
 Rekognition: https://aws.amazon.com/rekognition/
 
 
-
-and Android Player SDK with APIs to discover and play music.
-Base the seeding of the recommendation engine on selfies with
+TODO
+----
+noun project attrib - yeoul kwon, timothy miller
+OS attrib
 
 
 stack already
