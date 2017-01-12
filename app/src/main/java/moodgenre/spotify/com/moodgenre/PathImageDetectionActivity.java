@@ -1,7 +1,6 @@
 package moodgenre.spotify.com.moodgenre;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -10,11 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.regions.Regions;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -26,25 +22,18 @@ import pl.tajchert.nammu.Nammu;
 import pl.tajchert.nammu.PermissionCallback;
 
 
-public class PathImageDetectionActivity extends Activity  {
-
-    private static final int SPOTIFY_AUTH_REQUEST_CODE = 1738;
+public class PathImageDetectionActivity extends BaseActivity  {
 
     private Button chooseImageButton;
     private ImageView selectedImage;
-    private TextView label1;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_path_image_detection);
 
-        Log.d(Constants.TAG, "onCreate");
-
         chooseImageButton = (Button) findViewById(R.id.button_choose_image);
         selectedImage = (ImageView) findViewById(R.id.image_selected);
-        label1 = (TextView) findViewById(R.id.label);
 
         chooseImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,7 +44,7 @@ public class PathImageDetectionActivity extends Activity  {
 
         checkPerms();
 
-        initAmazonAuth();
+        
     }
 
     @Override
@@ -123,38 +112,6 @@ public class PathImageDetectionActivity extends Activity  {
     // AMZN
     //
 
-    private void initAmazonAuth() {
-        // AMZN
-        // Initialize the Amazon Cognito credentials provider
-        // TODO check if already authed/cache/etc?
-        final CognitoCachingCredentialsProvider credentialsProvider =
-                new CognitoCachingCredentialsProvider(getApplicationContext(),
-                        Constants.AMZN_IDENTITY_POOL_ID,
-                        Regions.US_EAST_2
-                );
-        new Thread(new Runnable() {
-            public void run() {
-                String identityId = credentialsProvider.getIdentityId();
-                Log.d(Constants.TAG, "AMZN ID is " + identityId);
-            }
-        }).start();
-
-        /*
-        // Initialize the Cognito Sync client
-        CognitoSyncManager syncClient = new CognitoSyncManager(
-                getApplicationContext(),
-                Regions.US_EAST_2, // Region
-                credentialsProvider);
-        // Create a record in a dataset and synchronize with the server
-        Dataset dataset = syncClient.openOrCreateDataset("myDataset");
-        dataset.put("myKey", "myValue");
-        dataset.synchronize(new DefaultSyncCallback() {
-            @Override
-            public void onSuccess(Dataset dataset, List newRecords) {
-                //Your handler code here
-            }
-        });
-        */
-    }
+   
 
 }

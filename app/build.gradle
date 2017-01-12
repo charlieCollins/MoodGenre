@@ -43,12 +43,7 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    // AMZN
-    compile 'com.amazonaws:aws-android-sdk-core:2.3.+'
-    compile 'com.amazonaws:aws-android-sdk-cognito:2.3.+'
-    compile 'com.amazonaws:aws-android-sdk-rekognition:2.3.+'
-    //compile 'com.amazonaws:aws-android-sdk-s3:2.2.+'
-    //compile 'com.amazonaws:aws-android-sdk-ddb:2.2.+'
+    // TODO add google vision from GCP
 
     // SPOT
     // (had to change names and use ext approach diff from docs)

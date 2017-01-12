@@ -67,8 +67,6 @@ public class MainActivity extends BaseActivity  {
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        Log.d(Constants.TAG, "onActivityResult");
-
         // Spotify auth callback
         if (requestCode == SPOTIFY_AUTH_REQUEST_CODE) {
             Log.d(Constants.TAG, "SPOTIFY_AUTH_REQUEST_CODE match, process response");
