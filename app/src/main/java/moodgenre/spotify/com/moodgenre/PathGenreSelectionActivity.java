@@ -1,6 +1,5 @@
 package moodgenre.spotify.com.moodgenre;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.AppCompatCheckBox;
@@ -65,7 +64,6 @@ public class PathGenreSelectionActivity extends BaseActivity  {
                     return;
                 }
 
-                MoodGenreApplication application = (MoodGenreApplication) PathGenreSelectionActivity.this.getApplication();
                 application.setPlaylist(trackList);
                 startActivity(new Intent(PathGenreSelectionActivity.this, PlayerActivity.class));
             }
@@ -95,8 +93,7 @@ public class PathGenreSelectionActivity extends BaseActivity  {
 
             }
         });
-
-        MoodGenreApplication application = (MoodGenreApplication) this.getApplication();
+  
         spotifyService = application.getSpotifyService();
         spotifyAccessToken = application.getSpotifyAccessToken();
     }

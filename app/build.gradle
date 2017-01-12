@@ -43,7 +43,10 @@ repositories {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    // TODO add google vision from GCP
+    // GOOG
+    compile 'com.google.api-client:google-api-client-android:1.22.0' exclude module: 'httpclient'
+    compile 'com.google.http-client:google-http-client-gson:1.22.0' exclude module: 'httpclient'
+    compile 'com.google.apis:google-api-services-vision:v1-rev2-1.21.0'
 
     // SPOT
     // (had to change names and use ext approach diff from docs)

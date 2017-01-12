@@ -1,13 +1,10 @@
 package moodgenre.spotify.com.moodgenre;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,19 +19,11 @@ import com.spotify.sdk.android.player.PlayerEvent;
 import com.spotify.sdk.android.player.Spotify;
 import com.spotify.sdk.android.player.SpotifyPlayer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import moodgenre.spotify.com.moodgenre.adapters.TrackListAdapter;
 import moodgenre.spotify.com.moodgenre.model.Track;
-import moodgenre.spotify.com.moodgenre.model.TrackContainer;
-import moodgenre.spotify.com.moodgenre.service.SpotifyService;
-import rx.Observable;
-import rx.Subscriber;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.schedulers.Schedulers;
 
 
 public class PlayerActivity extends BaseActivity  {

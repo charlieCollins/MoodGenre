@@ -1,6 +1,5 @@
 package moodgenre.spotify.com.moodgenre;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;

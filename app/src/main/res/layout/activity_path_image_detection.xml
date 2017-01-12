@@ -17,12 +17,23 @@
         android:layout_height="wrap_content"
         android:text="Choose Image" />
 
+    <Button
+        android:id="@+id/button_goto_player"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Goto Player (with sentiment playlist)" />
 
     <ImageView
         android:id="@+id/image_selected"
         android:layout_width="200dp"
         android:layout_height="200dp"
         android:layout_margin="10dp"/>
+
+    <TextView
+        android:id="@+id/label_sentiment_detected"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+         />
 
 
 </LinearLayout>
