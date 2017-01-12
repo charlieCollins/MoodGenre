@@ -29,10 +29,19 @@
         android:layout_height="200dp"
         android:layout_margin="10dp"/>
 
+    <ProgressBar
+        android:id="@+id/progressbar1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:layout_margin="5dp" />
+
     <TextView
         android:id="@+id/label_sentiment_detected"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
          />
 
 

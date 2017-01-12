@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import moodgenre.spotify.com.moodgenre.model.Genre;
@@ -66,6 +68,7 @@ public class PathImageDetectionActivity extends BaseActivity {
     private Button gotoPlayerButton;
     private ImageView selectedImage;
     private TextView sentimentDetectedLabel;
+    private ProgressBar progressBar;
 
     private String spotifyAccessToken;
     private SpotifyService spotifyService;
@@ -81,6 +84,7 @@ public class PathImageDetectionActivity extends BaseActivity {
         gotoPlayerButton = (Button) findViewById(R.id.button_goto_player);
         selectedImage = (ImageView) findViewById(R.id.image_selected);
         sentimentDetectedLabel = (TextView) findViewById(R.id.label_sentiment_detected);
+        progressBar = (ProgressBar) findViewById(R.id.progressbar1); 
 
         gotoPlayerButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,6 +119,8 @@ public class PathImageDetectionActivity extends BaseActivity {
         if (requestCode == EasyImageConfig.REQ_PICK_PICTURE_FROM_GALLERY) {
             Log.d(Constants.TAG, "IMAGE_PICKER_REQUEST_CODE match, process response");
 
+            progressBar.setVisibility(View.VISIBLE);            
+
             EasyImage.handleActivityResult(requestCode, resultCode, intent, this, new DefaultCallback() {
                 @Override
                 public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
@@ -139,16 +145,29 @@ public class PathImageDetectionActivity extends BaseActivity {
                         @Override
                         public void onCompleted() {
                             Log.d(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest COMPLETED");
+                            progressBar.setVisibility(View.GONE);
                         }
 
                         @Override
                         public void onError(Throwable e) {
                             Log.e(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest ERROR:" + e.getMessage());
+                            progressBar.setVisibility(View.GONE);
                         }
 
                         @Override
                         public void onNext(List<FaceAnnotation> faceAnnotations) {
+
+                            progressBar.setVisibility(View.GONE);
+                            
                             Log.d(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest faceAnnotations:" + faceAnnotations.size());
+                            
+                            if (faceAnnotations == null || faceAnnotations.isEmpty()) {
+                                Toast.makeText(PathImageDetectionActivity.this, "no faces detected", Toast.LENGTH_LONG).show();
+                                sentimentDetectedLabel.setText("no faces");
+                                return;
+                            }
+                            
+                            // TODO aggregate the face annotations, for now we just use the first one, not the best/most rec one
                             FaceAnnotation faceAnnotation = faceAnnotations.get(0);
                             
                             // google can do sorrow, joy, anger, surprise
@@ -156,32 +175,37 @@ public class PathImageDetectionActivity extends BaseActivity {
                             // (api docs refer to an enum for this but can't find it in javadoc index, fucking strings)
                             
                             // build genreList using detected facial sentiment                            
-                            List<Genre> genreList = new ArrayList<Genre>();
+                            List<String> emotionList = new ArrayList<String>();
                             if (faceAnnotation.getDetectionConfidence() > 0.5) {
+
+                                Log.d(Constants.TAG, "   anger:" + faceAnnotation.getAngerLikelihood());
+                                Log.d(Constants.TAG, "   joy:" + faceAnnotation.getJoyLikelihood());
+                                Log.d(Constants.TAG, "   sorrow:" + faceAnnotation.getSorrowLikelihood());
+                                
                                 // joy, sorrow, anger
                                 if (isLikely(faceAnnotation.getAngerLikelihood())) {
                                     // ANGRY
                                     Log.d(Constants.TAG, this.getClass().getSimpleName() + " face ANGRY");
                                     sentimentDetectedLabel.setText("Detected: ANGER");
-                                    genreList.add(Genre.ANGRY);                                    
+                                    emotionList.addAll(Genre.ANGRY.getEmotions());                                    
                                 } else if (isLikely(faceAnnotation.getSorrowLikelihood())) {
                                     // SORROW
                                     Log.d(Constants.TAG, this.getClass().getSimpleName() + " face SORROWFUL");
                                     sentimentDetectedLabel.setText("Detected: SORROW");
-                                    genreList.add(Genre.SAD);                                    
+                                    emotionList.addAll(Genre.SAD.getEmotions());                                    
                                 } else if (isLikely(faceAnnotation.getJoyLikelihood())) {
                                     // JOY
                                     Log.d(Constants.TAG, this.getClass().getSimpleName() + " face JOYFUL");
                                     sentimentDetectedLabel.setText("Detected: JOY");
-                                    genreList.add(Genre.HAPPY);
+                                    emotionList.addAll(Genre.HAPPY.getEmotions());
                                 }                                
                             } else {
                                 Log.d(Constants.TAG, this.getClass().getSimpleName() + " face confidence low, giving up");
                                 Toast.makeText(PathImageDetectionActivity.this, "face confidence low, giving up", Toast.LENGTH_LONG).show();
                             }       
                             
-                            if (genreList.size() > 0) {
-                                genPlaylist(genreList);
+                            if (emotionList.size() > 0) {
+                                genPlaylist(emotionList);
                                 Toast.makeText(PathImageDetectionActivity.this, "Playlist created, use goto playlist button...", Toast.LENGTH_LONG).show();                                
                             } else {
                                 Log.d(Constants.TAG, this.getClass().getSimpleName() + " face sentiment not detected, giving up");
@@ -203,11 +227,11 @@ public class PathImageDetectionActivity extends BaseActivity {
     // private
     //
     
-    private void genPlaylist(List<Genre> genreList) {
+    private void genPlaylist(List<String> emotionList) {
         
-        Log.d(Constants.TAG, "genPlaylist");
+        Log.d(Constants.TAG, "genPlaylist using genreList:" + emotionList);
         
-        String genreListString = TextUtils.join(",", genreList);
+        String genreListString = TextUtils.join(",", emotionList);
         Observable<TrackContainer> observable = spotifyService.getRecommendations("Bearer " + spotifyAccessToken, genreListString);
         Subscription subscription = observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -225,8 +249,7 @@ public class PathImageDetectionActivity extends BaseActivity {
                     @Override
                     public void onNext(TrackContainer trackContainer) {
                         Log.d(Constants.TAG, "Spotify getRecommendations TrackContainer: " + trackContainer);
-                        List<Track> trackList = trackContainer.getTracks();
-                        application.setPlaylist(trackList);
+                        application.setPlaylist(trackContainer.getTracks());
                         trackListCreated = true;
                     }
                 });
@@ -324,7 +347,6 @@ public class PathImageDetectionActivity extends BaseActivity {
         annotateImageRequest.setFeatures(featureList);
         annotateImageRequest.setImage(image);        
         
-        
         // one of the worst APIs ever created
         // come on google, to make a single I have to inject it into a batch (names and stringly typed and clumsy and sucks)
         try {
@@ -340,9 +362,9 @@ public class PathImageDetectionActivity extends BaseActivity {
                 AnnotateImageResponse response = batchResponse.getResponses().get(0);   // clumsy 
                 Status status = response.getError(); // status is error? wtf
                 Log.d(Constants.TAG, this.getClass().getSimpleName() + " response Status:" + status);
-                
-                // add all face annotations to resp
-                faceAnnotations.addAll(response.getFaceAnnotations());
+                if (response.getFaceAnnotations() != null) {
+                    faceAnnotations.addAll(response.getFaceAnnotations());
+                }
             } else {
                 Log.e(Constants.TAG, this.getClass().getSimpleName() + " batch response error, no internal responses");
             }
