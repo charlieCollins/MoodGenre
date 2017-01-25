@@ -29,7 +29,7 @@ import rx.functions.Action1;
 
 public class PlayerActivity extends BaseActivity  {
 
-    private ImageView playPauseButton;
+    private ImageView buttonPlayPause;
     private TextView labelNowPlaying;
 
     private RecyclerView trackListRecyclerView;
@@ -47,10 +47,10 @@ public class PlayerActivity extends BaseActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        playPauseButton = (ImageView) findViewById(R.id.button_play_pause);
+        buttonPlayPause = (ImageView) findViewById(R.id.button_play_pause);
         labelNowPlaying = (TextView) findViewById(R.id.label_now_playing);
 
-        playPauseButton.setOnClickListener(new View.OnClickListener() {
+        buttonPlayPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // toggle spot pause/play
@@ -224,7 +224,7 @@ public class PlayerActivity extends BaseActivity  {
                 break;
             case kSpPlaybackNotifyLostPermission:
                 Toast.makeText(PlayerActivity.this, "Spotify player perms lost (logged in elsewhere?)", Toast.LENGTH_LONG).show();
-                playPauseButton.setImageResource(android.R.drawable.ic_media_play);
+                buttonPlayPause.setImageResource(android.R.drawable.ic_media_play);
                 startActivity(new Intent(PlayerActivity.this, MainActivity.class));
                 break;
             case kSpPlaybackNotifyMetadataChanged:
@@ -232,10 +232,10 @@ public class PlayerActivity extends BaseActivity  {
             case kSpPlaybackNotifyNext:
                 break;
             case kSpPlaybackNotifyPause:
-                playPauseButton.setImageResource(android.R.drawable.ic_media_play);                
+                buttonPlayPause.setImageResource(android.R.drawable.ic_media_play);                
                 break;
             case kSpPlaybackNotifyPlay:
-                playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
+                buttonPlayPause.setImageResource(android.R.drawable.ic_media_pause);
                 // TODO get current playing track here? 
                 //labelNowPlaying.setText(spotifyPlayer.getMetadata().currentTrack.
                 break;

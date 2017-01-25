@@ -71,10 +71,10 @@ public class PathImageDetectionActivity extends BaseActivity {
     private static final int IMAGE_DESIRED_WIDTH = 640;
     private static final int IMAGE_DESIRED_HEIGHT = 480;
 
-    private Button chooseImageButton;
-    private Button gotoPlayerButton;
-    private ImageView selectedImage;
-    private TextView sentimentDetectedLabel;
+    private Button buttonChooseImage;
+    private Button buttonGotoPlayer;
+    private ImageView imageViewSelected;
+    private TextView labelSentiment;
     private ProgressBar progressBar;
 
     private String spotifyAccessToken;
@@ -92,13 +92,13 @@ public class PathImageDetectionActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_path_image_detection);
 
-        chooseImageButton = (Button) findViewById(R.id.button_choose_image);
-        gotoPlayerButton = (Button) findViewById(R.id.button_goto_player);
-        selectedImage = (ImageView) findViewById(R.id.image_selected);
-        sentimentDetectedLabel = (TextView) findViewById(R.id.label_sentiment_detected);
+        buttonChooseImage = (Button) findViewById(R.id.button_choose_image);
+        buttonGotoPlayer = (Button) findViewById(R.id.button_goto_player);
+        imageViewSelected = (ImageView) findViewById(R.id.image_selected);
+        labelSentiment = (TextView) findViewById(R.id.label_sentiment_detected);
         progressBar = (ProgressBar) findViewById(R.id.progressbar1); 
 
-        gotoPlayerButton.setOnClickListener(new View.OnClickListener() {
+        buttonGotoPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!trackListCreated) {
@@ -109,7 +109,7 @@ public class PathImageDetectionActivity extends BaseActivity {
             }
         });
         
-        chooseImageButton.setOnClickListener(new View.OnClickListener() {
+        buttonChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 trackListCreated = false;
@@ -132,7 +132,7 @@ public class PathImageDetectionActivity extends BaseActivity {
             Log.d(Constants.TAG, "IMAGE_PICKER_REQUEST_CODE match, process response");
 
             progressBar.setVisibility(View.VISIBLE);
-            sentimentDetectedLabel.setText("");
+            labelSentiment.setText("");
 
             EasyImage.handleActivityResult(requestCode, resultCode, intent, this, new DefaultCallback() {
                 @Override
@@ -149,7 +149,7 @@ public class PathImageDetectionActivity extends BaseActivity {
                             .load(imageFile)
                             .fit()
                             .centerCrop()
-                            .into(selectedImage);
+                            .into(imageViewSelected);
 
                     processSelectedImage(imageFile);
                 }
@@ -184,7 +184,7 @@ public class PathImageDetectionActivity extends BaseActivity {
 
                 if (faceAnnotations == null || faceAnnotations.isEmpty()) {
                     Toast.makeText(PathImageDetectionActivity.this, "no faces detected", Toast.LENGTH_LONG).show();
-                    sentimentDetectedLabel.setText("no faces detected");
+                    labelSentiment.setText("no faces detected");
                     return;
                 }
                 
@@ -215,7 +215,7 @@ public class PathImageDetectionActivity extends BaseActivity {
         for (FaceAnnotationData data : faceAnnotationDataList) { 
             if (data.genre != null) {
                 detected = true;
-                sentimentDetectedLabel.setText("sentiment detected:" + data.genre.toString());
+                labelSentiment.setText("sentiment detected:" + data.genre.toString());
                 genPlaylist(data.genre.getEmotions());
                 Toast.makeText(PathImageDetectionActivity.this, "Playlist created, use goto player button...", Toast.LENGTH_LONG).show();
                 break; // for NOW just break after first face and use that (no aggregate or such)
@@ -224,7 +224,7 @@ public class PathImageDetectionActivity extends BaseActivity {
         
         if (!detected) {
             Toast.makeText(PathImageDetectionActivity.this, "No sentiment detected", Toast.LENGTH_LONG).show();
-            sentimentDetectedLabel.setText("");
+            labelSentiment.setText("");
         }
     }                    
                     
@@ -337,17 +337,17 @@ public class PathImageDetectionActivity extends BaseActivity {
             Nammu.askForPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE, new PermissionCallback() {
                 @Override
                 public void permissionGranted() {
-                    chooseImageButton.setEnabled(true);
+                    buttonChooseImage.setEnabled(true);
                 }
 
                 @Override
                 public void permissionRefused() {
                     Toast.makeText(PathImageDetectionActivity.this, "cannot use image selector, permission not granted", Toast.LENGTH_SHORT).show();
-                    chooseImageButton.setEnabled(false);
+                    buttonChooseImage.setEnabled(false);
                 }
             });
         } else {
-            chooseImageButton.setEnabled(true);
+            buttonChooseImage.setEnabled(true);
         }
     }
 

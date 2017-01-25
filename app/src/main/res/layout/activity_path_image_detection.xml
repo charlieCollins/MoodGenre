@@ -18,6 +18,12 @@
         android:text="Choose Image" />
 
     <Button
+        android:id="@+id/button_capture_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Capture Image" />
+    
+    <Button
         android:id="@+id/button_goto_player"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

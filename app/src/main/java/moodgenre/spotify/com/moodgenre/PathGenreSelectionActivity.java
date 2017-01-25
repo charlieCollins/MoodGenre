@@ -29,12 +29,12 @@ import rx.schedulers.Schedulers;
 
 public class PathGenreSelectionActivity extends BaseActivity  {
 
-    private Button getPlaylistButton;
-    private Button gotoPlayerButton;
-    private AppCompatCheckBox happyCheckbox;
-    private AppCompatCheckBox sadCheckbox;
-    private AppCompatCheckBox angryCheckbox;
-    private AppCompatCheckBox confusedCheckbox;
+    private Button buttonGetPlaylist;
+    private Button buttonGotoPlayer;
+    private AppCompatCheckBox checkboxHappy;
+    private AppCompatCheckBox checkboxSad;
+    private AppCompatCheckBox checkboxAngry;
+    private AppCompatCheckBox checkboxConfused;
 
     private RecyclerView trackListRecyclerView;
     private TrackListAdapter trackListAdapter;
@@ -49,14 +49,14 @@ public class PathGenreSelectionActivity extends BaseActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_path_genre_selection);
 
-        getPlaylistButton = (Button) findViewById(R.id.button_get_playlist);
-        gotoPlayerButton = (Button) findViewById(R.id.button_goto_player);
-        happyCheckbox = (AppCompatCheckBox) findViewById(R.id.checkbox_happy);
-        sadCheckbox = (AppCompatCheckBox) findViewById(R.id.checkbox_sad);
-        angryCheckbox = (AppCompatCheckBox) findViewById(R.id.checkbox_angry);
-        confusedCheckbox = (AppCompatCheckBox) findViewById(R.id.checkbox_confused);
+        buttonGetPlaylist = (Button) findViewById(R.id.button_get_playlist);
+        buttonGotoPlayer = (Button) findViewById(R.id.button_goto_player);
+        checkboxHappy = (AppCompatCheckBox) findViewById(R.id.checkbox_happy);
+        checkboxSad = (AppCompatCheckBox) findViewById(R.id.checkbox_sad);
+        checkboxAngry = (AppCompatCheckBox) findViewById(R.id.checkbox_angry);
+        checkboxConfused = (AppCompatCheckBox) findViewById(R.id.checkbox_confused);
 
-        gotoPlayerButton.setOnClickListener(new View.OnClickListener() {
+        buttonGotoPlayer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (trackList == null || trackList.isEmpty()) {
@@ -69,7 +69,7 @@ public class PathGenreSelectionActivity extends BaseActivity  {
             }
         });
 
-        getPlaylistButton.setOnClickListener(new View.OnClickListener() {
+        buttonGetPlaylist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getSpotifyRecommendations();
@@ -114,16 +114,16 @@ public class PathGenreSelectionActivity extends BaseActivity  {
         }
 
         List<String> genreList = new ArrayList<>();
-        if (happyCheckbox.isChecked()) {
+        if (checkboxHappy.isChecked()) {
             genreList.addAll(Genre.HAPPY.getEmotions());
         }
-        if (sadCheckbox.isChecked()) {
+        if (checkboxSad.isChecked()) {
             genreList.addAll(Genre.SAD.getEmotions());
         }
-        if (angryCheckbox.isChecked()) {
+        if (checkboxAngry.isChecked()) {
             genreList.addAll(Genre.ANGRY.getEmotions());
         }
-        if (confusedCheckbox.isChecked()) {
+        if (checkboxConfused.isChecked()) {
             genreList.addAll(Genre.CONFUSED.getEmotions());
         }
         String genreListString = TextUtils.join(",", genreList);
