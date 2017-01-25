@@ -1,5 +1,6 @@
 package moodgenre.spotify.com.moodgenre;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -64,21 +65,19 @@ public class PlayerActivity extends BaseActivity  {
                     if (!playbackState.isPlaying && playbackState.positionMs == 0) {
                         // nothing has been started yet play track 1
                         Track track = trackListAdapter.getFirstTrack();
+                        labelNowPlaying.setText(track.getName());
                         spotifyPlayer.playUri(null, track.getUri(), 0, 0);
-                        playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
                         return;
                     }
                     
                     if (playbackState.isPlaying) {
                         spotifyPlayer.pause(spotifyPlayerOperationCallback);
-                        playPauseButton.setImageResource(android.R.drawable.ic_media_play);
                         return;
                     } 
                     
                     if (!playbackState.isPlaying && playbackState.positionMs > 0) {
                         // TODO how to tell if player is paused, idPlaying false and just position != 0? or is there an actual pause state, weird?
                         spotifyPlayer.resume(spotifyPlayerOperationCallback);
-                        playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
                         return;
                     } 
                     
@@ -118,8 +117,6 @@ public class PlayerActivity extends BaseActivity  {
             @Override
             public void call(Track track) {
                 // TODO make other adapter list items not clickable until one is processed?
-                ///Toast.makeText(PlayerActivity.this, "playing track: " + track.getName(), Toast.LENGTH_SHORT).show();
-                playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
                 labelNowPlaying.setText(track.getName());
                 spotifyPlayer.playUri(null, track.getUri(), 0, 0);
             }
@@ -185,7 +182,6 @@ public class PlayerActivity extends BaseActivity  {
     // SPOT
     //
 
-
     private void initSpotifyPlayer() {
         
         Log.d(Constants.TAG, "initSpotifyPlayer");
@@ -227,14 +223,21 @@ public class PlayerActivity extends BaseActivity  {
             case kSpPlaybackNotifyContextChanged:
                 break;
             case kSpPlaybackNotifyLostPermission:
+                Toast.makeText(PlayerActivity.this, "Spotify player perms lost (logged in elsewhere?)", Toast.LENGTH_LONG).show();
+                playPauseButton.setImageResource(android.R.drawable.ic_media_play);
+                startActivity(new Intent(PlayerActivity.this, MainActivity.class));
                 break;
             case kSpPlaybackNotifyMetadataChanged:
                 break;
             case kSpPlaybackNotifyNext:
                 break;
             case kSpPlaybackNotifyPause:
+                playPauseButton.setImageResource(android.R.drawable.ic_media_play);                
                 break;
             case kSpPlaybackNotifyPlay:
+                playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
+                // TODO get current playing track here? 
+                //labelNowPlaying.setText(spotifyPlayer.getMetadata().currentTrack.
                 break;
             case kSpPlaybackNotifyPrev:
                 break;
