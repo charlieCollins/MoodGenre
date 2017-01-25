@@ -217,7 +217,7 @@ public class PathImageDetectionActivity extends BaseActivity {
                 detected = true;
                 sentimentDetectedLabel.setText("sentiment detected:" + data.genre.toString());
                 genPlaylist(data.genre.getEmotions());
-                Toast.makeText(PathImageDetectionActivity.this, "Playlist created, use goto playlist button...", Toast.LENGTH_LONG).show();
+                Toast.makeText(PathImageDetectionActivity.this, "Playlist created, use goto player button...", Toast.LENGTH_LONG).show();
                 break; // for NOW just break after first face and use that (no aggregate or such)
             }
         }
