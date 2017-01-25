@@ -132,6 +132,7 @@ public class PathImageDetectionActivity extends BaseActivity {
         spotifyService = application.getSpotifyService();
         spotifyAccessToken = application.getSpotifyAccessToken();
         
+        // TODO remove EasyImage, or fork it and add support for opening FRONT camera 
         EasyImage.configuration(this).setImagesFolderName("MoodGenre");
     }
 
