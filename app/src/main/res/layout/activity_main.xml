@@ -12,11 +12,35 @@
     <include layout="@layout/screen_header" />
 
     <LinearLayout
+        android:id="@+id/layout_unauthenticated"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:orientation="vertical"
         android:gravity="center">
+
+        <TextView
+            android:id="@+id/label_unathenticated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not authenticated" />
+
+
+        <Button
+            android:id="@+id/button_authenticate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Spotify Auth" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_authenticated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
 
         <ImageView
             android:id="@+id/button_path_image_detection"

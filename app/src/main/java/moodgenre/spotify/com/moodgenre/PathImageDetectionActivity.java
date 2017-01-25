@@ -38,11 +38,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import moodgenre.spotify.com.moodgenre.model.Genre;
-import moodgenre.spotify.com.moodgenre.model.Track;
 import moodgenre.spotify.com.moodgenre.model.TrackContainer;
 import moodgenre.spotify.com.moodgenre.service.SpotifyService;
 import pl.aprilapps.easyphotopicker.DefaultCallback;
@@ -63,6 +61,15 @@ public class PathImageDetectionActivity extends BaseActivity {
 
     private static final String ANDROID_CERT_HEADER = "X-Android-Cert";
     private static final String ANDROID_PACKAGE_HEADER = "X-Android-Package";
+    
+    private static final String LIKELY = "LIKELY";
+    private static final String UNLIKELY = "UNLIKELY";
+    private static final String VERY_LIKELY = "VERY_LIKELY";
+    private static final String POSSIBLE = "POSSIBLE";
+    
+    private static final double FACE_CONFIDENCE_THRESHOLD = 0.6;
+    private static final int IMAGE_DESIRED_WIDTH = 640;
+    private static final int IMAGE_DESIRED_HEIGHT = 480;
 
     private Button chooseImageButton;
     private Button gotoPlayerButton;
@@ -74,6 +81,11 @@ public class PathImageDetectionActivity extends BaseActivity {
     private SpotifyService spotifyService;
     
     private boolean trackListCreated;
+
+    private class FaceAnnotationData {
+        public FaceAnnotation faceAnnotation;
+        public Genre genre;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,7 +131,8 @@ public class PathImageDetectionActivity extends BaseActivity {
         if (requestCode == EasyImageConfig.REQ_PICK_PICTURE_FROM_GALLERY) {
             Log.d(Constants.TAG, "IMAGE_PICKER_REQUEST_CODE match, process response");
 
-            progressBar.setVisibility(View.VISIBLE);            
+            progressBar.setVisibility(View.VISIBLE);
+            sentimentDetectedLabel.setText("");
 
             EasyImage.handleActivityResult(requestCode, resultCode, intent, this, new DefaultCallback() {
                 @Override
@@ -129,95 +142,16 @@ public class PathImageDetectionActivity extends BaseActivity {
 
                 @Override
                 public void onImagePicked(File imageFile, EasyImage.ImageSource source, int type) {
-                    Log.d(Constants.TAG, "EasyImage picked file" + imageFile.getName());
+                    Log.d(Constants.TAG, "EasyImage picked file" + imageFile.getName());                   
 
-                    sentimentDetectedLabel.setText("");
-                    
                     // the chosen image
                     Picasso.with(PathImageDetectionActivity.this)
                             .load(imageFile)
                             .fit()
                             .centerCrop()
                             .into(selectedImage);
-                    
-                    
-                    Observer<List<FaceAnnotation>> processImageRequestObserver = new Observer<List<FaceAnnotation>>() {
-                        @Override
-                        public void onCompleted() {
-                            Log.d(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest COMPLETED");
-                            progressBar.setVisibility(View.GONE);
-                        }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest ERROR:" + e.getMessage());
-                            progressBar.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onNext(List<FaceAnnotation> faceAnnotations) {
-
-                            progressBar.setVisibility(View.GONE);
-                            
-                            Log.d(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest faceAnnotations:" + faceAnnotations.size());
-                            
-                            if (faceAnnotations == null || faceAnnotations.isEmpty()) {
-                                Toast.makeText(PathImageDetectionActivity.this, "no faces detected", Toast.LENGTH_LONG).show();
-                                sentimentDetectedLabel.setText("no faces");
-                                return;
-                            }
-                            
-                            // TODO aggregate the face annotations, for now we just use the first one, not the best/most rec one
-                            FaceAnnotation faceAnnotation = faceAnnotations.get(0);
-                            
-                            // google can do sorrow, joy, anger, surprise
-                            // likelihood is UNKNOWN, VERY_UNLIKELY, UNLIKELY, POSSIBLE, LIKELY, VERY_LIKELY
-                            // (api docs refer to an enum for this but can't find it in javadoc index, fucking strings)
-                            
-                            // build genreList using detected facial sentiment                            
-                            List<String> emotionList = new ArrayList<String>();
-                            if (faceAnnotation.getDetectionConfidence() > 0.5) {
-
-                                Log.d(Constants.TAG, "   anger:" + faceAnnotation.getAngerLikelihood());
-                                Log.d(Constants.TAG, "   joy:" + faceAnnotation.getJoyLikelihood());
-                                Log.d(Constants.TAG, "   sorrow:" + faceAnnotation.getSorrowLikelihood());
-                                
-                                // joy, sorrow, anger
-                                if (isLikely(faceAnnotation.getAngerLikelihood())) {
-                                    // ANGRY
-                                    Log.d(Constants.TAG, this.getClass().getSimpleName() + " face ANGRY");
-                                    sentimentDetectedLabel.setText("Detected: ANGER");
-                                    emotionList.addAll(Genre.ANGRY.getEmotions());                                    
-                                } else if (isLikely(faceAnnotation.getSorrowLikelihood())) {
-                                    // SORROW
-                                    Log.d(Constants.TAG, this.getClass().getSimpleName() + " face SORROWFUL");
-                                    sentimentDetectedLabel.setText("Detected: SORROW");
-                                    emotionList.addAll(Genre.SAD.getEmotions());                                    
-                                } else if (isLikely(faceAnnotation.getJoyLikelihood())) {
-                                    // JOY
-                                    Log.d(Constants.TAG, this.getClass().getSimpleName() + " face JOYFUL");
-                                    sentimentDetectedLabel.setText("Detected: JOY");
-                                    emotionList.addAll(Genre.HAPPY.getEmotions());
-                                }                                
-                            } else {
-                                Log.d(Constants.TAG, this.getClass().getSimpleName() + " face confidence low, giving up");
-                                Toast.makeText(PathImageDetectionActivity.this, "face confidence low, giving up", Toast.LENGTH_LONG).show();
-                            }       
-                            
-                            if (emotionList.size() > 0) {
-                                genPlaylist(emotionList);
-                                Toast.makeText(PathImageDetectionActivity.this, "Playlist created, use goto playlist button...", Toast.LENGTH_LONG).show();                                
-                            } else {
-                                Log.d(Constants.TAG, this.getClass().getSimpleName() + " face sentiment not detected, giving up");
-                                Toast.makeText(PathImageDetectionActivity.this, "Sentiment not detected", Toast.LENGTH_LONG).show();                                
-                            }                            
-                        }
-                    };
-
-                    observeImageRequest(imageFile).subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe(processImageRequestObserver);
-
+                    processSelectedImage(imageFile);
                 }
             });
         }
@@ -226,6 +160,121 @@ public class PathImageDetectionActivity extends BaseActivity {
     //
     // private
     //
+    
+    private void processSelectedImage(File imageFile) {
+
+        Observer<List<FaceAnnotation>> processImageRequestObserver = new Observer<List<FaceAnnotation>>() {
+            @Override
+            public void onCompleted() {
+                Log.d(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest COMPLETED");
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Log.e(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest ERROR:" + e.getMessage());
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onNext(List<FaceAnnotation> faceAnnotations) {
+                progressBar.setVisibility(View.GONE);
+
+                Log.d(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest faceAnnotations size:" + faceAnnotations.size());
+
+                if (faceAnnotations == null || faceAnnotations.isEmpty()) {
+                    Toast.makeText(PathImageDetectionActivity.this, "no faces detected", Toast.LENGTH_LONG).show();
+                    sentimentDetectedLabel.setText("no faces detected");
+                    return;
+                }
+                
+                // for each faceannotation get the emotionlist (Strings) that can be passed to recommendation service
+                List<FaceAnnotationData> faceAnnotationDataList = new ArrayList<>();
+                for (FaceAnnotation faceAnnotation : faceAnnotations) {
+                    FaceAnnotationData faceAnnotationData = processFaceAnnotation(faceAnnotation);
+                    faceAnnotationDataList.add(faceAnnotationData);
+                }
+
+                displayResults(faceAnnotationDataList); 
+            } 
+        };
+
+        // make net request and observe
+        observeImageRequest(imageFile).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(processImageRequestObserver);
+    }
+
+    private void displayResults(List<FaceAnnotationData> faceAnnotationDataList) {
+        
+        if (faceAnnotationDataList == null) {
+            return;
+        }
+        
+        boolean detected = false;
+        for (FaceAnnotationData data : faceAnnotationDataList) { 
+            if (data.genre != null) {
+                detected = true;
+                sentimentDetectedLabel.setText("sentiment detected:" + data.genre.toString());
+                genPlaylist(data.genre.getEmotions());
+                Toast.makeText(PathImageDetectionActivity.this, "Playlist created, use goto playlist button...", Toast.LENGTH_LONG).show();
+                break; // for NOW just break after first face and use that (no aggregate or such)
+            }
+        }
+        
+        if (!detected) {
+            Toast.makeText(PathImageDetectionActivity.this, "No sentiment detected", Toast.LENGTH_LONG).show();
+            sentimentDetectedLabel.setText("");
+        }
+    }                    
+                    
+    private FaceAnnotationData processFaceAnnotation(FaceAnnotation faceAnnotation) {
+        Log.d(Constants.TAG, this.getClass().getSimpleName() + " process faceAnnotation:" + faceAnnotation);
+
+        // google can do sorrow, joy, anger, surprise
+        // likelihood is UNKNOWN, VERY_UNLIKELY, UNLIKELY, POSSIBLE, LIKELY, VERY_LIKELY
+        // (api docs refer to an enum for this but can't find it in javadoc index, damn strings)
+
+        // build genreList using detected facial sentiment                            
+        FaceAnnotationData faceAnnotationData = new FaceAnnotationData();
+        faceAnnotationData.faceAnnotation = faceAnnotation;
+        
+        if (faceAnnotation.getDetectionConfidence() > FACE_CONFIDENCE_THRESHOLD) {            
+            
+            Log.d(Constants.TAG, "   anger:" + faceAnnotation.getAngerLikelihood());
+            Log.d(Constants.TAG, "   sorrow:" + faceAnnotation.getSorrowLikelihood());
+            Log.d(Constants.TAG, "   joy:" + faceAnnotation.getJoyLikelihood());
+            Log.d(Constants.TAG, "   surprise:" + faceAnnotation.getSurpriseLikelihood());
+            
+
+            // process in order, anger, sorrow, joy, surprise
+            // FUTURE come with faceannotation processing strategy and allow dynamic config
+            // FUTURE allow setting switch between "possible" inclusion or not            
+            
+            if (isLikelyOrPossible(faceAnnotation.getAngerLikelihood())) {
+                // ANGRY
+                Log.d(Constants.TAG, this.getClass().getSimpleName() + " face ANGRY");
+                faceAnnotationData.genre = Genre.ANGRY;
+            } else if (isLikelyOrPossible(faceAnnotation.getSorrowLikelihood())) {
+                // SORROW
+                Log.d(Constants.TAG, this.getClass().getSimpleName() + " face SORROWFUL");
+                faceAnnotationData.genre = Genre.SAD;
+            } else if (isLikelyOrPossible(faceAnnotation.getJoyLikelihood())) {
+                // JOY
+                Log.d(Constants.TAG, this.getClass().getSimpleName() + " face JOYFUL");
+                faceAnnotationData.genre = Genre.HAPPY;
+            } else if (isLikelyOrPossible(faceAnnotation.getSurpriseLikelihood())) {
+                // SURPRISE
+                Log.d(Constants.TAG, this.getClass().getSimpleName() + " face SURPRISED");
+                faceAnnotationData.genre = Genre.SURPRISED;
+            }
+        } else {
+            Log.d(Constants.TAG, this.getClass().getSimpleName() + " face confidence low, giving up");
+            ///Toast.makeText(PathImageDetectionActivity.this, "face confidence low, giving up", Toast.LENGTH_LONG).show();
+        }
+        
+        return faceAnnotationData;
+    }
     
     private void genPlaylist(List<String> emotionList) {
         
@@ -255,8 +304,25 @@ public class PathImageDetectionActivity extends BaseActivity {
                 });
     }
     
+    private boolean isLikelyOrPossible(String text) {
+        if (text == null) {
+            return false;
+        }
+        
+        if (isLikely(text)) {
+            return true;
+        }
+        if (text.equals(POSSIBLE)) {
+            return true;
+        }
+        return false;
+    }
+    
     private boolean isLikely(String text) {
-        if (text != null && text.equals("LIKELY") || text.equals("VERY_LIKELY")) {
+        if (text == null) {
+            return false;
+        }
+        if (text.equals(LIKELY) || text.equals(VERY_LIKELY)) {
             return true;
         }
         return false;        
@@ -286,7 +352,7 @@ public class PathImageDetectionActivity extends BaseActivity {
     }
 
     //
-    // GOOG
+    // GOOG Cloud Vision API 
     //
 
     private Observable<List<FaceAnnotation>> observeImageRequest(final File file) {
@@ -336,7 +402,8 @@ public class PathImageDetectionActivity extends BaseActivity {
         featureList.add(faceDetectionFeature);
 
         // Cloud Vision API recommends 640x480 for "most cases"
-        Bitmap bitmap = ImageUtils.decodeSampledBitmapFromFile(file.getAbsolutePath(), 640, 480);
+        Bitmap bitmap = ImageUtils.decodeSampledBitmapFromFile(file.getAbsolutePath(), 
+                IMAGE_DESIRED_WIDTH, IMAGE_DESIRED_HEIGHT);
         Image image = new Image();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, byteArrayOutputStream);
@@ -373,5 +440,7 @@ public class PathImageDetectionActivity extends BaseActivity {
         }
         
         return faceAnnotations;
-    }
+    }  
+    
+   
 }

@@ -5,7 +5,10 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.spotify.sdk.android.authentication.AuthenticationClient;
 import com.spotify.sdk.android.authentication.AuthenticationRequest;
@@ -19,6 +22,9 @@ public class MainActivity extends BaseActivity  {
 
     private ImageView buttonPathImageDetection;
     private ImageView buttonPathGenreSelection;
+    private Button buttonAuthenticate;
+    private LinearLayout layoutAuthenticated;
+    private LinearLayout layoutUnAuthenticated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +33,9 @@ public class MainActivity extends BaseActivity  {
 
         buttonPathImageDetection = (ImageView) findViewById(R.id.button_path_image_detection);
         buttonPathGenreSelection = (ImageView) findViewById(R.id.button_path_genre_selection);
+        buttonAuthenticate = (Button) findViewById(R.id.button_authenticate);
+        layoutAuthenticated = (LinearLayout) findViewById(R.id.layout_authenticated);
+        layoutUnAuthenticated = (LinearLayout) findViewById(R.id.layout_unauthenticated); 
 
         buttonPathImageDetection.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,9 +53,14 @@ public class MainActivity extends BaseActivity  {
                 buttonPathGenreSelection.setColorFilter(0xFF000000, PorterDuff.Mode.MULTIPLY);
                 startActivity(new Intent(MainActivity.this, PathGenreSelectionActivity.class));
             }
+        });  
+        
+        buttonAuthenticate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initSpotifyAuth();
+            }
         });        
-     
-        initSpotifyAuth();
     }
 
     @Override
@@ -73,10 +87,22 @@ public class MainActivity extends BaseActivity  {
             AuthenticationResponse response = AuthenticationClient.getResponse(resultCode, intent);
             Log.d(Constants.TAG, "response type: " + response.getType().toString());
 
-            if (response.getType() == AuthenticationResponse.Type.TOKEN) {
-                String spotifyAccessToken = response.getAccessToken();
-                application.setSpotifyAccessToken(spotifyAccessToken);
-            }
+            AuthenticationResponse.Type responseType = response.getType();
+            
+            switch(responseType) {
+                case TOKEN:
+                    String spotifyAccessToken = response.getAccessToken();
+                    application.setSpotifyAccessToken(spotifyAccessToken);
+                    transitionUI(true);                    
+                    break;
+                default:
+                    // this will catch ERROR, UNKNOWN, CODE (which I don't know what to with any)
+                    Toast.makeText(MainActivity.this, "Spotify auth request failed:" 
+                            + responseType.toString() + " " + response.getError().toString(), Toast.LENGTH_LONG).show();
+                    Log.d(Constants.TAG, "response error (if any): " + response.getError());
+                    transitionUI(false);
+                    break;
+            }           
         }
     }
 
@@ -88,6 +114,24 @@ public class MainActivity extends BaseActivity  {
     // SPOT
     //
 
+    private void transitionUI(boolean authenticated) {
+        if (authenticated) {
+            if (layoutAuthenticated.getVisibility() == View.VISIBLE) {
+                return;
+            } else {
+                layoutUnAuthenticated.setVisibility(View.GONE);
+                layoutAuthenticated.setVisibility(View.VISIBLE);                
+            }
+        } else {
+            if (layoutAuthenticated.getVisibility() == View.VISIBLE) {
+                layoutAuthenticated.setVisibility(View.GONE);
+                layoutUnAuthenticated.setVisibility(View.VISIBLE);
+            } else {
+                return;
+            }
+        }
+    }
+    
     private void initSpotifyAuth() {
         String spotifyAccessToken = application.getSpotifyAccessToken();
         if (spotifyAccessToken == null) {
@@ -100,8 +144,10 @@ public class MainActivity extends BaseActivity  {
             builder.setScopes(new String[]{"user-read-private", "streaming"});
             AuthenticationRequest request = builder.build();
             AuthenticationClient.openLoginActivity(this, SPOTIFY_AUTH_REQUEST_CODE, request);
+            transitionUI(false);
         } else {
             Log.d(Constants.TAG, "spotifyAccessToken present, no request needed:" + spotifyAccessToken);
+            transitionUI(true);
         }
     }
 }

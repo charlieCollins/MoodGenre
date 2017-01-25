@@ -46,8 +46,6 @@ public class PlayerActivity extends BaseActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_player);
 
-        MoodGenreApplication application = (MoodGenreApplication) this.getApplication();
-
         playPauseButton = (ImageView) findViewById(R.id.button_play_pause);
         labelNowPlaying = (TextView) findViewById(R.id.label_now_playing);
 
@@ -60,17 +58,33 @@ public class PlayerActivity extends BaseActivity  {
                 } else {
                     // SpotifyPlayer provides init and connect methods; direct controls (play uri, pause, seek, skip, resume); and state (metadata and playbackstate)
                     PlaybackState playbackState = spotifyPlayer.getPlaybackState();
+                    Log.d(Constants.TAG, "playPause click, playbackState:" + playbackState);
                     Metadata metadata = spotifyPlayer.getMetadata();
+                    
+                    if (!playbackState.isPlaying && playbackState.positionMs == 0) {
+                        // nothing has been started yet play track 1
+                        Track track = trackListAdapter.getFirstTrack();
+                        spotifyPlayer.playUri(null, track.getUri(), 0, 0);
+                        playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
+                        return;
+                    }
+                    
                     if (playbackState.isPlaying) {
                         spotifyPlayer.pause(spotifyPlayerOperationCallback);
                         playPauseButton.setImageResource(android.R.drawable.ic_media_play);
-                    } else if (playbackState.positionMs > 0) {
-                        // TODO how to tell if player is paused, just position > 0? or is there an actual pause state?
+                        return;
+                    } 
+                    
+                    if (!playbackState.isPlaying && playbackState.positionMs > 0) {
+                        // TODO how to tell if player is paused, idPlaying false and just position != 0? or is there an actual pause state, weird?
                         spotifyPlayer.resume(spotifyPlayerOperationCallback);
                         playPauseButton.setImageResource(android.R.drawable.ic_media_pause);
-                    } else {
-                        Toast.makeText(PlayerActivity.this, "Spotify player not ready, get some recommendations and play first", Toast.LENGTH_LONG).show();
-                    }
+                        return;
+                    } 
+                    
+                    // get here it's weird
+                    Log.d(Constants.TAG, "error unexepected playback state:" + playbackState);
+                    Toast.makeText(PlayerActivity.this, "Spotify playback state weird:" + playbackState, Toast.LENGTH_LONG).show();                    
                 }
             }
         });
@@ -78,17 +92,16 @@ public class PlayerActivity extends BaseActivity  {
         spotifyPlayerNotificationCallback = new Player.NotificationCallback() {
             @Override
             public void onPlaybackEvent(PlayerEvent playerEvent) {
-                Log.d(Constants.TAG, "Spotify player notif callback: playback event received: " + playerEvent.name());
+                Log.d(Constants.TAG, "Spotify player notif callback: playback event: " + playerEvent.name());
                 handleSpotifyEvent(playerEvent);
             }
 
             @Override
             public void onPlaybackError(Error error) {
-                Log.d(Constants.TAG, "Spotify player notif callback: playback error received: " + error.name());
+                Log.d(Constants.TAG, "Spotify player notif callback: playback error: " + error.name());
                 handleSpotifyError(error);
             }
         };
-
 
         // recycler view
         List<Track> playList = application.getPlaylist();
@@ -174,6 +187,8 @@ public class PlayerActivity extends BaseActivity  {
 
 
     private void initSpotifyPlayer() {
+        
+        Log.d(Constants.TAG, "initSpotifyPlayer");
 
         if (spotifyAccessToken == null) {
             Toast.makeText(this, "Spotify access token not present, cannot continue", Toast.LENGTH_LONG).show();

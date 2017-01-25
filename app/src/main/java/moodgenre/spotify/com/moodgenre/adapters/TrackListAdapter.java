@@ -82,6 +82,14 @@ public class TrackListAdapter extends RecyclerView.Adapter<TrackListAdapter.View
     public int getItemCount() {
         return tracks.size();
     }
+    
+    // used to prime the pump, before an item selection is made, if necessary
+    public Track getFirstTrack() {
+        if (tracks == null || tracks.isEmpty()) {
+            return null;
+        }
+        return tracks.get(0);
+    }
 
     public Observable<Track> asObservable(){
         return onClickSubject.asObservable();
