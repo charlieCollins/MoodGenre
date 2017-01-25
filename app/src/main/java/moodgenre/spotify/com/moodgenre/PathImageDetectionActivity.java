@@ -72,6 +72,7 @@ public class PathImageDetectionActivity extends BaseActivity {
     private static final int IMAGE_DESIRED_HEIGHT = 480;
 
     private Button buttonChooseImage;
+    private Button buttonCaptureImage;
     private Button buttonGotoPlayer;
     private ImageView imageViewSelected;
     private TextView labelSentiment;
@@ -93,6 +94,7 @@ public class PathImageDetectionActivity extends BaseActivity {
         setContentView(R.layout.activity_path_image_detection);
 
         buttonChooseImage = (Button) findViewById(R.id.button_choose_image);
+        buttonCaptureImage = (Button) findViewById(R.id.button_capture_image);
         buttonGotoPlayer = (Button) findViewById(R.id.button_goto_player);
         imageViewSelected = (ImageView) findViewById(R.id.image_selected);
         labelSentiment = (TextView) findViewById(R.id.label_sentiment_detected);
@@ -107,7 +109,7 @@ public class PathImageDetectionActivity extends BaseActivity {
                 }                
                 startActivity(new Intent(PathImageDetectionActivity.this, PlayerActivity.class));
             }
-        });
+        });        
         
         buttonChooseImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,45 +118,60 @@ public class PathImageDetectionActivity extends BaseActivity {
                 EasyImage.openGallery(PathImageDetectionActivity.this, EasyImageConfig.REQ_PICK_PICTURE_FROM_GALLERY);
             }
         });
+        
+        buttonCaptureImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                trackListCreated = false;
+                EasyImage.openCamera(PathImageDetectionActivity.this, EasyImage.REQ_TAKE_PICTURE);
+            }
+        });
 
         checkPerms();
 
         spotifyService = application.getSpotifyService();
         spotifyAccessToken = application.getSpotifyAccessToken();
+        
+        EasyImage.configuration(this).setImagesFolderName("MoodGenre");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
 
-        // image picker callback
-        if (requestCode == EasyImageConfig.REQ_PICK_PICTURE_FROM_GALLERY) {
-            Log.d(Constants.TAG, "IMAGE_PICKER_REQUEST_CODE match, process response");
+        labelSentiment.setText("");
 
-            progressBar.setVisibility(View.VISIBLE);
-            labelSentiment.setText("");
+        EasyImage.handleActivityResult(requestCode, resultCode, intent, this, new DefaultCallback() {
+            @Override
+            public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
+                Log.e(Constants.TAG, "EasyImage error:" + e.getMessage());
+            }
 
-            EasyImage.handleActivityResult(requestCode, resultCode, intent, this, new DefaultCallback() {
-                @Override
-                public void onImagePickerError(Exception e, EasyImage.ImageSource source, int type) {
-                    Log.e(Constants.TAG, "EasyImage error:" + e.getMessage());
+            @Override
+            public void onImagePicked(File imageFile, EasyImage.ImageSource source, int type) {
+                Log.d(Constants.TAG, "EasyImage picked file" + imageFile.getName());
+
+                // the chosen image
+                Picasso.with(PathImageDetectionActivity.this)
+                        .load(imageFile)
+                        .fit()
+                        .centerCrop()
+                        .into(imageViewSelected);
+
+                progressBar.setVisibility(View.VISIBLE);
+
+                processSelectedImage(imageFile);
+            }
+
+            @Override
+            public void onCanceled(EasyImage.ImageSource source, int type) {
+                //Cancel handling, you might wanna remove taken photo if it was canceled
+                if (source == EasyImage.ImageSource.CAMERA) {
+                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(MainActivity.this);
+                    if (photoFile != null) photoFile.delete();
                 }
-
-                @Override
-                public void onImagePicked(File imageFile, EasyImage.ImageSource source, int type) {
-                    Log.d(Constants.TAG, "EasyImage picked file" + imageFile.getName());                   
-
-                    // the chosen image
-                    Picasso.with(PathImageDetectionActivity.this)
-                            .load(imageFile)
-                            .fit()
-                            .centerCrop()
-                            .into(imageViewSelected);
-
-                    processSelectedImage(imageFile);
-                }
-            });
-        }
+            }
+        });
     }
 
     //
