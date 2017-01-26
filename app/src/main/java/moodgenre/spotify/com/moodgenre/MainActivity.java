@@ -138,9 +138,9 @@ public class MainActivity extends BaseActivity  {
             Log.d(Constants.TAG, "spotifyAccessToken NOT present, make request");
             AuthenticationRequest.Builder builder =
                     new AuthenticationRequest.Builder(
-                            Constants.SPOTIFY_CLIENT_ID,
+                            application.getSpotifyClientId(),
                             AuthenticationResponse.Type.TOKEN,
-                            Constants.SPOTIFY_REDIRECT_URI);
+                            application.getSpotifyCallbackUri());
             builder.setScopes(new String[]{"user-read-private", "streaming"});
             AuthenticationRequest request = builder.build();
             AuthenticationClient.openLoginActivity(this, SPOTIFY_AUTH_REQUEST_CODE, request);

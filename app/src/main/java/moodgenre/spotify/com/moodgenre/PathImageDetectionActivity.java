@@ -391,7 +391,7 @@ public class PathImageDetectionActivity extends BaseActivity {
         Log.d(Constants.TAG, this.getClass().getSimpleName() + " visionProcessRequest for file:" + file.getName());
 
         VisionRequestInitializer requestInitializer =
-                new VisionRequestInitializer(Constants.GCP_API_KEY) {
+                new VisionRequestInitializer(application.getGcpApiKey()) {
                     @Override
                     protected void initializeVisionRequest(VisionRequest<?> visionRequest)
                             throws IOException {

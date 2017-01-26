@@ -191,7 +191,7 @@ public class PlayerActivity extends BaseActivity  {
             return;
         }
 
-        Config playerConfig = new Config(this, spotifyAccessToken, Constants.SPOTIFY_CLIENT_ID);
+        Config playerConfig = new Config(this, spotifyAccessToken, application.getSpotifyClientId());
         Spotify.getPlayer(playerConfig, this, new SpotifyPlayer.InitializationObserver() {
             @Override
             public void onInitialized(SpotifyPlayer player) {

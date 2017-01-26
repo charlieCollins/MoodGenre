@@ -1,13 +1,18 @@
 package moodgenre.spotify.com.moodgenre;
 
 import android.app.Application;
+import android.content.res.AssetManager;
+import android.util.Log;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 import moodgenre.spotify.com.moodgenre.model.Track;
 import moodgenre.spotify.com.moodgenre.service.SpotifyService;
@@ -23,6 +28,12 @@ import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class MoodGenreApplication extends Application {
 
+    // properties from config file -- see assets/app.properties
+    // (these ids and such are not checked into source control, instead read from properties)
+    private String spotifyClientId;
+    private String spotifyCallbackUri;
+    private String gcpApiKey;
+    
     private String spotifyAccessToken;
     private List<Track> playlist;
 
@@ -34,6 +45,7 @@ public class MoodGenreApplication extends Application {
 
         playlist = new ArrayList<>();
 
+        loadProperties();
         initService();
     }
 
@@ -71,11 +83,43 @@ public class MoodGenreApplication extends Application {
     public SpotifyService getSpotifyService() {
         return this.spotifyService;
     }
+    
+    public String getSpotifyClientId() {
+        return this.spotifyClientId;
+    }
+    
+    public String getSpotifyCallbackUri() {
+        return this.spotifyCallbackUri;
+    }
+    
+    public String getGcpApiKey() {
+        return this.gcpApiKey;
+    }
 
     //
     // private
     //
 
+    private void loadProperties() {
+        try {
+            AssetManager am = getAssets();
+            InputStream is = am.open("app.properties");
+            Properties props = new Properties();
+            props.load(is);
+            spotifyClientId = props.getProperty("spotify.client.id");
+            spotifyCallbackUri = props.getProperty("spotify.callback.uri");
+            gcpApiKey = props.getProperty("gcp.api.key");            
+            is.close();
+        } catch (IOException e) {
+            Log.e(Constants.TAG, "cannot load properties from config file, unrecoverable");
+        }
+
+        Log.d(Constants.TAG, "MoodGenreApplication properties loaded");
+        Log.d(Constants.TAG, "   spotifyClientId:" + spotifyClientId);
+        Log.d(Constants.TAG, "   spotifyCallbackUri:" + spotifyCallbackUri);
+        Log.d(Constants.TAG, "   gcpApiKey:" + gcpApiKey);        
+    }
+    
     private void initService() {
 
         HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
