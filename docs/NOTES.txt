@@ -1,26 +1,13 @@
-MoodGenre concept
------------------
-Use Spotify Auth SDK to auth.
-Use Spotify SDK to control player, manage playlists, and discover music (recommendation via Echo Nest).
-Use Google Vision API to process images (selfies or otherwise) and determine facial "sentiment."
-Based on sentiment auto start a corresponding playlist.
-
-Other ideas:
-* do the opposite of sentiment, cheer me up, make me sad?
-* allow key recommendation inputs to be specified, danceability, speechiness, popularity, etc
-* show more relevant ads based on sentiment?
-
-Spotify Auth SDK: https://developer.spotify.com/technologies/spotify-android-sdk/android-sdk-authentication-guide/
-Spotify Android SDK: https://developer.spotify.com/technologies/spotify-android-sdk/
-
+MoodGenre 
+----------
+See README.md for gen concept and overview.
 
 TODO
 ----
 noun project attrib - yeoul kwon, timothy miller
 OS attrib
 
-
-stack already
+Stack
 -------------
 OkHtpClient
 RetroFit
