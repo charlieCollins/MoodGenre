@@ -168,7 +168,7 @@ public class PathImageDetectionActivity extends BaseActivity {
             public void onCanceled(EasyImage.ImageSource source, int type) {
                 //Cancel handling, you might wanna remove taken photo if it was canceled
                 if (source == EasyImage.ImageSource.CAMERA) {
-                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(MainActivity.this);
+                    File photoFile = EasyImage.lastlyTakenButCanceledPhoto(PathImageDetectionActivity.this);
                     if (photoFile != null) photoFile.delete();
                 }
             }
