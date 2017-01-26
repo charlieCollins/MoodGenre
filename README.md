@@ -19,11 +19,7 @@ Cloud Vision: https://cloud.google.com/vision/
 
 ## Dev
 Import into IDEA   
-Rename ConstantsTemplate (java file) to Constants, and set your own app IDs (Spotify and Amazon AWS).   
-
-## TODO
-noun project attrib - yeoul kwon, timothy miller   
-OS attrib   
+copy template.app.properties to app.properties and fill in correct client IDs for your project
 
 
 ## Stack
