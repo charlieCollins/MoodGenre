@@ -144,6 +144,5 @@ public class MoodGenreApplication extends Application {
                 .build();
 
         spotifyService = retrofit.create(SpotifyService.class);
-
     }
 }
